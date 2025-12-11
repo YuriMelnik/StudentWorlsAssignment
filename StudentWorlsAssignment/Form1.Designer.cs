@@ -73,7 +73,9 @@
             dataGridViewStudentvsMark.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewStudentvsMark.Columns.AddRange(new DataGridViewColumn[] { Student, Mark });
             dataGridViewStudentvsMark.Location = new Point(547, 201);
+            dataGridViewStudentvsMark.MultiSelect = false;
             dataGridViewStudentvsMark.Name = "dataGridViewStudentvsMark";
+            dataGridViewStudentvsMark.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dataGridViewStudentvsMark.Size = new Size(387, 325);
             dataGridViewStudentvsMark.TabIndex = 2;
             dataGridViewStudentvsMark.CellClick += DataGridViewStudentvsMark_CellContentClick;
@@ -106,6 +108,7 @@
             // 
             listBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBoxFiles.FormattingEnabled = true;
+            listBoxFiles.ItemHeight = 15;
             listBoxFiles.Location = new Point(12, 465);
             listBoxFiles.Name = "listBoxFiles";
             listBoxFiles.Size = new Size(526, 64);

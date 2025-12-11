@@ -38,7 +38,7 @@ namespace StudentWorlsAssignment.Services
 
             foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
             {
-                string innerFileName = Path.GetFileName(entry.Key);
+                string innerFileName = Path.GetFileName(entry.Key)!;
                 string studentName = Path.GetFileNameWithoutExtension(innerFileName);
 
                 string studentFolder = Path.Combine(baseOutputDir, studentName);
@@ -106,5 +106,6 @@ namespace StudentWorlsAssignment.Services
                 }
             }
         }
+    
     }
 }

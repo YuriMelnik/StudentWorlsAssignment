@@ -16,6 +16,7 @@ namespace StudentWorlsAssignment
 {
     public partial class Form1 : Form
     {
+        protected override bool ShowFocusCues => true;
 
         private static readonly string[] CSharpKeywords =
         {
@@ -73,9 +74,9 @@ namespace StudentWorlsAssignment
 
         private async void MoveToPrevFileOrStudent()
         {
-            // есть предыдущий файл
+            // часть с listBoxFiles оставл€ем как есть
             if (listBoxFiles.Items.Count > 0 &&
-            listBoxFiles.SelectedIndex > 0)
+                listBoxFiles.SelectedIndex > 0)
             {
                 listBoxFiles.SelectedIndex -= 1;
                 return;
@@ -87,10 +88,11 @@ namespace StudentWorlsAssignment
                 return;
             }
 
+            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
             int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+
             if (rowIndex <= 0)
             {
-                // первый студент Ч мигнЄм
                 await BlinkControlAsync(dataGridViewStudentvsMark);
                 return;
             }
@@ -99,8 +101,8 @@ namespace StudentWorlsAssignment
 
             dataGridViewStudentvsMark.ClearSelection();
             dataGridViewStudentvsMark.CurrentCell =
-            dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[0];
-            dataGridViewStudentvsMark.Rows[prevRowIndex].Selected = true;
+                dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol];
+            dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol].Selected = true;
 
             LoadFilesForCurrentStudent();
 
@@ -110,38 +112,37 @@ namespace StudentWorlsAssignment
 
         private async void MoveToNextFileOrStudent()
         {
-            // 1) ≈сли есть ещЄ файл в списке Ч просто выбрать его
+            // 1) сначала листаем файлы
             if (listBoxFiles.Items.Count > 0 &&
-            listBoxFiles.SelectedIndex >= 0 &&
-            listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
+                listBoxFiles.SelectedIndex >= 0 &&
+                listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
             {
                 listBoxFiles.SelectedIndex += 1;
                 return;
             }
 
-            // 2) ‘айлы закончились Ч переходим к следующему студенту
             if (dataGridViewStudentvsMark.CurrentRow == null)
             {
-                await BlinkControlAsync(listBoxFiles); // совсем некуда
+                await BlinkControlAsync(listBoxFiles);
                 return;
-
             }
 
+            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
             int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+
             if (rowIndex < 0 || rowIndex >= dataGridViewStudentvsMark.Rows.Count - 2)
             {
                 await BlinkControlAsync(dataGridViewStudentvsMark);
-                return; // текущий студент последний, дальше некуда
+                return;
             }
 
             int nextRowIndex = rowIndex + 1;
 
             dataGridViewStudentvsMark.ClearSelection();
             dataGridViewStudentvsMark.CurrentCell =
-            dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[0];
-            dataGridViewStudentvsMark.Rows[nextRowIndex].Selected = true;
+                dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol];
+            dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
 
-            // загрузить файлы дл€ следующего студента и выбрать первый
             LoadFilesForCurrentStudent();
             if (listBoxFiles.Items.Count > 0)
                 listBoxFiles.SelectedIndex = 0;
@@ -149,15 +150,42 @@ namespace StudentWorlsAssignment
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (keyData == Keys.Down)
+            switch (keyData)
             {
-                MoveToNextFileOrStudent();
-                return true;
-            }
-            if (keyData == Keys.Up)
-            {
-                MoveToPrevFileOrStudent();
-                return true;
+                case Keys.Down:
+                    MoveToNextFileOrStudent();
+                    return true;
+                case Keys.Up:
+                    MoveToPrevFileOrStudent();
+                    return true;
+                case Keys.Left:
+                    if (dataGridViewStudentvsMark.CurrentRow != null)
+                    {
+                        dataGridViewStudentvsMark.Focus();
+                        dataGridViewStudentvsMark.CurrentCell =
+                            dataGridViewStudentvsMark.CurrentRow.Cells[0]; // им€ студента
+                    }
+                    return true;
+
+                case Keys.Right:
+                    // сначала оценка
+                    if (dataGridViewStudentvsMark.Focused &&
+                        dataGridViewStudentvsMark.CurrentRow != null)
+                    {
+                        dataGridViewStudentvsMark.CurrentCell =
+                            dataGridViewStudentvsMark.CurrentRow.Cells[1]; // оценка
+                    }
+                    else
+                    {
+                        // потом список файлов
+                        if (listBoxFiles.Items.Count > 0)
+                        {
+                            listBoxFiles.Focus();
+                            if (listBoxFiles.SelectedIndex < 0)
+                                listBoxFiles.SelectedIndex = 0;
+                        }
+                    }
+                    return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
@@ -205,7 +233,7 @@ namespace StudentWorlsAssignment
                 // очищаем список студентов и файлов
                 dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
                 listBoxFiles.Items.Clear();
-                panelPreview.Controls.Clear();
+                ClearPreview();
 
                 string archivePath = openFileDialog.FileName;
 
@@ -278,7 +306,7 @@ namespace StudentWorlsAssignment
         private void LoadStudentFilesToListBox(string studentName)
         {
             listBoxFiles.Items.Clear();
-            panelPreview.Controls.Clear();
+            ClearPreview();
 
             if (_studentFileService == null)
                 return;
@@ -305,44 +333,11 @@ namespace StudentWorlsAssignment
             if (listBoxFiles.Items.Count > 0)
                 listBoxFiles.SelectedIndex = 0;
 
-
-            //            string studentFolder = Path.Combine(_baseOutputDir, studentName);
-
-
-            //            // если папка отсутствует Ч просто очищаем всЄ и выходим
-            //            if (!Directory.Exists(studentFolder)) // проверка существовани€ каталога.[web:303]
-            //            {
-            //                listBoxFiles.Items.Clear();
-            //                panelPreview.Controls.Clear();
-            //                TextBox textBox = new TextBox();
-            //                textBox.Width = panelPreview.Width;
-            //                textBox.Height = panelPreview.Height;
-            //                textBox.Font = new WinFont(textBox.Font.FontFamily, 18);
-            //                textBox.Text = "ƒл€ этого студента нет папки с ответом";
-            //                panelPreview.Controls.Add(textBox);
-            //                return;
-            //            }
-
-            //            var allowedExt = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
-            //".pdf", ".doc", ".docx", ".txt", ".rtf",
-            //".cs", ".xcf", ".py" };
-
-            //            var files = Directory.GetFiles(studentFolder, "*.*", SearchOption.AllDirectories)
-            //            .Where(f => allowedExt.Contains(Path.GetExtension(f).ToLowerInvariant()))
-            //            .ToList();
-
-            //            foreach (var f in files)
-            //                listBoxFiles.Items.Add(new FileItem(f));
-
-            //            if (listBoxFiles.Items.Count > 0)
-            //            {
-            //                listBoxFiles.SelectedIndex = 0;
-            //            }
         }
 
         private void ShowFileInPanel(string filePath)
         {
-            panelPreview.Controls.Clear();
+            ClearPreview();
 
             string ext = Path.GetExtension(filePath).ToLowerInvariant();
 
@@ -430,7 +425,22 @@ namespace StudentWorlsAssignment
             }
         }
 
-       
+        private void ClearPreview()
+        {
+            foreach (System.Windows.Forms.Control ctrl in panelPreview.Controls)
+            {
+                if (ctrl is PictureBox pb && pb.Image != null)
+                {
+                    pb.Image.Dispose();
+                    pb.Image = null;
+                }
+                ctrl.Dispose();
+            }
+
+            panelPreview.Controls.Clear();
+        }
+
+
         private async Task BlinkControlAsync(WControl ctrl)
         {
             var oldColor = ctrl.BackColor;
