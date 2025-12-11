@@ -1,15 +1,10 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Common;
+using StudentWorlsAssignment.Models;
+using StudentWorlsAssignment.Services;
 using System.Diagnostics;
-using System.IO.Compression;
 using System.Media;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using WBody = DocumentFormat.OpenXml.Wordprocessing.Body;
 using WControl = System.Windows.Forms.Control;
 using WinColor = System.Drawing.Color;
@@ -21,6 +16,7 @@ namespace StudentWorlsAssignment
 {
     public partial class Form1 : Form
     {
+
         private static readonly string[] CSharpKeywords =
         {
 "abstract","as","base","bool","break","byte","case","catch","char","checked",
@@ -43,13 +39,23 @@ namespace StudentWorlsAssignment
 "try", "while", "with", "yield"
 };
 
+        private static readonly string[] allowedExtentions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
+".pdf", ".doc", ".docx", ".txt", ".rtf",
+".cs", ".xcf", ".py" };
 
         private string _baseOutputDir;
+
+        private StudentFileService _studentFileService;
+        private readonly ArchiveExtractor _archiveExtractor = new ArchiveExtractor();
+        private readonly SyntaxHighlighter _syntaxHighlighter;
+        private readonly DocxTextExtractor _docxTextExtractor = new DocxTextExtractor();
 
         public Form1()
         {
             InitializeComponent();
 
+            _syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
+            // TODO: ПО СТРЕЛКЕ ВЛЕВО ПЕРЕходить на клетку с оценкой
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
             checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
             dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
@@ -204,141 +210,54 @@ namespace StudentWorlsAssignment
                 string archivePath = openFileDialog.FileName;
 
                 labelArchivFileName.Text = archivePath;
+
                 _baseOutputDir = Path.Combine(
-                Path.GetDirectoryName(archivePath),
-                Path.GetFileNameWithoutExtension(archivePath)); // папка для всех работ[web:6]
+                    Path.GetDirectoryName(archivePath)!,
+                    Path.GetFileNameWithoutExtension(archivePath)); // папка для всех работ[web:6]
 
                 Directory.CreateDirectory(_baseOutputDir); // если есть — не упадёт[web:12]
 
-                ExtractArchivePerStudent(archivePath, _baseOutputDir);
+                try
+                {
+                    _archiveExtractor.ExtractPerStudent(archivePath, _baseOutputDir);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при распаковке архива: " + ex.Message);
+                    return;
+                }
+
+                // здесь — уже чисто UI: заполняем таблицу студентов по папкам
+                FillStudentsFromFolders();
+                // создаем сервис
+                _studentFileService = new StudentFileService(_baseOutputDir, allowedExtentions);
             }
         }
 
-        private void ExtractArchivePerStudent(string archivePath, string baseOutputDir)
+        private void FillStudentsFromFolders()
         {
-            string ext = Path.GetExtension(archivePath).ToLowerInvariant();
+            dataGridViewStudentvsMark.Rows.Clear();
 
-            if (ext == ".zip")
+            if (string.IsNullOrEmpty(_baseOutputDir))
+                return;
+
+            var studentFolders = Directory.GetDirectories(_baseOutputDir);
+
+            foreach (var folder in studentFolders)
             {
-                // Открываем общий ZIP-архив с работами
-                using (ZipArchive archive = ZipFile.OpenRead(archivePath))
-                {
-                    foreach (var entry in archive.Entries)
-                    {
-                        // Пропускаем "папки" внутри архива
-                        if (string.IsNullOrEmpty(entry.Name))
-                            continue;
-
-                        // Имя файла внутри архива, например "ivanov.zip" или "petrov.rar"
-                        string innerFileName = entry.Name;
-                        string studentName = Path.GetFileNameWithoutExtension(innerFileName); // "ivanov"[web:29]
-                        studentName = studentName.Split(['-', '_'])[0];
-
-                        // добавляю студента в список, если его ещё нет
-                        bool exists = dataGridViewStudentvsMark.Rows
-                        .Cast<DataGridViewRow>()
-                        .Any(r => (r.Cells[0].Value?.ToString() ?? "") == studentName);
-
-                        if (!exists)
-                        {
-                            // добавляю студента в список
-                            int rowIndex = dataGridViewStudentvsMark.Rows.Add();
-                            dataGridViewStudentvsMark.Rows[rowIndex].Cells[0].Value = studentName;
-                        }
-                        // может и не надо папку. в проектах и так есть папка, а простые задания просто файлы с именем студента
-                        // -- надо, в ответе может быть несколько файлов
-                        // Папка для конкретного студента
-                        string studentFolder = Path.Combine(baseOutputDir, studentName);
-                        Directory.CreateDirectory(studentFolder);
-
-                        // Временный путь для вложенного архива/файла
-                        string tempPath = Path.Combine(baseOutputDir, innerFileName);
-
-                        // Сохраняем вложенный файл из общего архива
-                        entry.ExtractToFile(tempPath, overwrite: true);
-
-                        // Определяем, что за файл внутри: zip, rar или просто файл
-                        string innerExt = Path.GetExtension(tempPath).ToLowerInvariant();
-
-                        if (innerExt == ".zip")
-                        {
-                            // Внутри ещё один zip — распаковываем его в папку студента
-                            ZipFile.ExtractToDirectory(tempPath, studentFolder, overwriteFiles: true);
-                            File.Delete(tempPath);
-                        }
-                        else if (innerExt == ".rar")
-                        {
-                            // Внутри rar — распаковываем через SharpCompress в папку студента
-                            using (var rar = RarArchive.Open(tempPath))
-                            {
-                                foreach (var rarEntry in rar.Entries)
-                                {
-                                    // SharpCompress сам создаст подпапки под studentFolder.[web:243][web:246]
-                                    rarEntry.WriteToDirectory(studentFolder, new ExtractionOptions
-                                    {
-                                        ExtractFullPath = true,
-                                        Overwrite = true
-                                    });
-                                }
-                            }
-                            File.Delete(tempPath);
-                        }
-                        else
-                        {
-                            // Это просто файл (например, один .csproj, .docx и т.п.)
-                            string destPath = Path.Combine(studentFolder, innerFileName);
-                            if (File.Exists(destPath))
-                                File.Delete(destPath);
-
-                            File.Move(tempPath, destPath);
-                        }
-                    }
-                }
-            }
-            else if (ext == ".rar")
-            {
-                // Если верхний архив уже RAR (общий архив со всеми работами)
-                using (var archive = RarArchive.Open(archivePath))
-                {
-                    foreach (var entry in archive.Entries)
-                    {
-                        if (entry.IsDirectory)
-                            continue;
-
-                        string innerFileName = Path.GetFileName(entry.Key);
-                        string studentName = Path.GetFileNameWithoutExtension(innerFileName);
-
-                        string studentFolder = Path.Combine(baseOutputDir, studentName);
-                        Directory.CreateDirectory(studentFolder);
-
-                        string destPath = Path.Combine(studentFolder, innerFileName);
-                        string destDir = Path.GetDirectoryName(destPath);
-                        if (!string.IsNullOrEmpty(destDir))
-                            Directory.CreateDirectory(destDir);
-
-                        entry.WriteToFile(destPath, new ExtractionOptions
-                        {
-                            ExtractFullPath = true,
-                            Overwrite = true
-                        });
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Поддерживаются только ZIP и RAR архивы.");
+                string studentName = Path.GetFileName(folder);
+                int rowIndex = dataGridViewStudentvsMark.Rows.Add();
+                dataGridViewStudentvsMark.Rows[rowIndex].Cells[0].Value = studentName;
             }
             if (dataGridViewStudentvsMark.Rows.Count > 0)
             {
                 dataGridViewStudentvsMark.ClearSelection();
-                dataGridViewStudentvsMark.CurrentCell =
-                dataGridViewStudentvsMark.Rows[0].Cells[0];
+                dataGridViewStudentvsMark.CurrentCell = dataGridViewStudentvsMark.Rows[0].Cells[0];
                 dataGridViewStudentvsMark.Rows[0].Selected = true;
-
                 LoadFilesForCurrentStudent();
-
             }
         }
+
 
         private void LoadFilesForCurrentStudent()
         {
@@ -359,41 +278,66 @@ namespace StudentWorlsAssignment
         private void LoadStudentFilesToListBox(string studentName)
         {
             listBoxFiles.Items.Clear();
-            if (string.IsNullOrEmpty(_baseOutputDir))
+            panelPreview.Controls.Clear();
+
+            if (_studentFileService == null)
                 return;
 
-            string studentFolder = Path.Combine(_baseOutputDir, studentName);
-
-
-            // если папка отсутствует — просто очищаем всё и выходим
-            if (!Directory.Exists(studentFolder)) // проверка существования каталога.[web:303]
+            if (!_studentFileService.TryGetStudentfiles(studentName, out var files))
             {
-                listBoxFiles.Items.Clear();
-                panelPreview.Controls.Clear();
-                TextBox textBox = new TextBox();
-                textBox.Width = panelPreview.Width;
-                textBox.Height = panelPreview.Height;
-                textBox.Font = new WinFont(textBox.Font.FontFamily, 18);
-                textBox.Text = "Для этого студента нет папки с ответом";
+                // нет папки или нет файлов — аккуратно показали сообщение
+                var textBox = new TextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    ReadOnly = true,
+                    Font = new WinFont("Segoe UI", 12),
+                    Text = "Для этого студента нет найденных файлов ответа."
+                };
                 panelPreview.Controls.Add(textBox);
                 return;
             }
-
-            var allowedExt = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
-".pdf", ".doc", ".docx", ".txt", ".rtf",
-".cs", ".xcf", ".py" };
-
-            var files = Directory.GetFiles(studentFolder, "*.*", SearchOption.AllDirectories)
-            .Where(f => allowedExt.Contains(Path.GetExtension(f).ToLowerInvariant()))
-            .ToList();
-
-            foreach (var f in files)
-                listBoxFiles.Items.Add(new FileItem(f));
+            foreach (var file in files)
+            {
+                listBoxFiles.Items.Add(file);
+            }
 
             if (listBoxFiles.Items.Count > 0)
-            {
                 listBoxFiles.SelectedIndex = 0;
-            }
+
+
+            //            string studentFolder = Path.Combine(_baseOutputDir, studentName);
+
+
+            //            // если папка отсутствует — просто очищаем всё и выходим
+            //            if (!Directory.Exists(studentFolder)) // проверка существования каталога.[web:303]
+            //            {
+            //                listBoxFiles.Items.Clear();
+            //                panelPreview.Controls.Clear();
+            //                TextBox textBox = new TextBox();
+            //                textBox.Width = panelPreview.Width;
+            //                textBox.Height = panelPreview.Height;
+            //                textBox.Font = new WinFont(textBox.Font.FontFamily, 18);
+            //                textBox.Text = "Для этого студента нет папки с ответом";
+            //                panelPreview.Controls.Add(textBox);
+            //                return;
+            //            }
+
+            //            var allowedExt = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
+            //".pdf", ".doc", ".docx", ".txt", ".rtf",
+            //".cs", ".xcf", ".py" };
+
+            //            var files = Directory.GetFiles(studentFolder, "*.*", SearchOption.AllDirectories)
+            //            .Where(f => allowedExt.Contains(Path.GetExtension(f).ToLowerInvariant()))
+            //            .ToList();
+
+            //            foreach (var f in files)
+            //                listBoxFiles.Items.Add(new FileItem(f));
+
+            //            if (listBoxFiles.Items.Count > 0)
+            //            {
+            //                listBoxFiles.SelectedIndex = 0;
+            //            }
         }
 
         private void ShowFileInPanel(string filePath)
@@ -413,15 +357,7 @@ namespace StudentWorlsAssignment
                 };
                 panelPreview.Controls.Add(pb); // вывод изображения в панели.[web:1][web:2]
             }
-            //else if (new[] { ".pdf", ".doc", ".docx" }.Contains(ext))
-            //{
-            // var wb = new WebBrowser
-            // {
-            // Dock = DockStyle.Fill
-            // };
-            // wb.Navigate(filePath); // Office/PDF в WebBrowser, если установлен соответствующий просмотрщик.[web:6][web:9]
-            // panelPreview.Controls.Add(wb);
-            //}
+            
             else if (ext == ".docx") // || ext == )
             {
                 var rtb = new RichTextBox
@@ -432,12 +368,12 @@ namespace StudentWorlsAssignment
                     WordWrap = false
                 };
 
-                string plainText = ExtractDocxText(filePath); // свой метод извлечения текста
+                string plainText = _docxTextExtractor.ExtractPlainTextFromDocx(filePath); // свой метод извлечения текста
                 rtb.Text = plainText;
                 if (checkBoxSyntax.Checked)
                 {
                     // подсвечиваем как C#
-                    HighlightCSharp(rtb); // тот же метод, что и для .cs
+                    _syntaxHighlighter.HighlightCSharp(rtb); // тот же метод, что и для .cs
                 }
                 panelPreview.Controls.Add(rtb);
             }
@@ -463,111 +399,16 @@ namespace StudentWorlsAssignment
                     {
                         if (ext == ".py")
                         {
-                            HighlightPython(rtb); // подсветка синтаксиса для Python.[web:425][web:430]
+                            _syntaxHighlighter.HighlightPython(rtb); // подсветка синтаксиса для Python.[web:425][web:430]
                         }
                         else if (ext == ".cs")
                         {
-                            HighlightCSharp(rtb); // новая подсветка для C#.[web:423]
+                            _syntaxHighlighter.HighlightCSharp(rtb); // новая подсветка для C#.[web:423]
                         }
                     }
                 }
                 panelPreview.Controls.Add(rtb);
             }
-        }
-
-        private void HighlightPython(RichTextBox rtb)
-        {
-            // отключаем перерисовку для уменьшения мерцания
-            rtb.SuspendLayout();
-
-            // сброс цвета
-            rtb.Select(0, rtb.TextLength);
-            rtb.SelectionColor = System.Drawing.Color.Black;
-
-            string text = rtb.Text;
-
-            // комментарии: с # до конца строки
-            var commentRegex = new Regex(@"#.*$", RegexOptions.Multiline);
-            foreach (Match m in commentRegex.Matches(text))
-            {
-                rtb.Select(m.Index, m.Length);
-                rtb.SelectionColor = System.Drawing.Color.Green;
-            }
-
-            // строковые литералы: "..." или '...'
-            var stringRegex = new Regex("\"[^\"]*\"|'[^']*'");
-            foreach (Match m in stringRegex.Matches(text))
-            {
-                rtb.Select(m.Index, m.Length);
-                rtb.SelectionColor = System.Drawing.Color.Brown;
-            }
-
-            // ключевые слова (грубовато, но рабоче)
-            foreach (string kw in PythonKeywords)
-            {
-                var kwRegex = new Regex(@"\b" + Regex.Escape(kw) + @"\b");
-                foreach (Match m in kwRegex.Matches(text))
-                {
-                    rtb.Select(m.Index, m.Length);
-                    rtb.SelectionColor = System.Drawing.Color.OrangeRed;
-                }
-            }
-
-            // возвращаем курсор в начало (опционально)
-            rtb.Select(0, 0);
-            rtb.SelectionColor = System.Drawing.Color.Black;
-
-            rtb.ResumeLayout();
-        }
-
-        private void HighlightCSharp(RichTextBox rtb)
-        {
-            rtb.SuspendLayout();
-
-            rtb.Select(0, rtb.TextLength);
-            rtb.SelectionColor = System.Drawing.Color.Black;
-
-            string text = rtb.Text;
-
-            // комментарии //...
-            var lineCommentRegex = new Regex(@"//.*$", RegexOptions.Multiline);
-            foreach (Match m in lineCommentRegex.Matches(text))
-            {
-                rtb.Select(m.Index, m.Length);
-                rtb.SelectionColor = System.Drawing.Color.Green;
-            }
-
-            // многострочные комментарии /* ... */
-            var blockCommentRegex = new Regex(@"/\*.*?\*/", RegexOptions.Singleline);
-            foreach (Match m in blockCommentRegex.Matches(text))
-            {
-                rtb.Select(m.Index, m.Length);
-                rtb.SelectionColor = System.Drawing.Color.Green;
-            }
-
-            // строковые литералы "..."
-            var stringRegex = new Regex("\"[^\"]*\"");
-            foreach (Match m in stringRegex.Matches(text))
-            {
-                rtb.Select(m.Index, m.Length);
-                rtb.SelectionColor = System.Drawing.Color.Brown;
-            }
-
-            // ключевые слова
-            foreach (string kw in CSharpKeywords)
-            {
-                var kwRegex = new Regex(@"\b" + Regex.Escape(kw) + @"\b");
-                foreach (Match m in kwRegex.Matches(text))
-                {
-                    rtb.Select(m.Index, m.Length);
-                    rtb.SelectionColor = System.Drawing.Color.Blue;
-                }
-            }
-
-            rtb.Select(0, 0);
-            rtb.SelectionColor = System.Drawing.Color.Black;
-
-            rtb.ResumeLayout();
         }
 
         private void DataGridViewStudentvsMark_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -589,32 +430,7 @@ namespace StudentWorlsAssignment
             }
         }
 
-        private string ExtractDocxText(string filePath)
-        {
-            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-                return string.Empty;
-
-            var sb = new StringBuilder();
-
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
-            {
-                WBody body = wordDoc.MainDocumentPart.Document.Body;
-                if (body == null)
-                    return string.Empty;
-
-                foreach (Paragraph p in body.Descendants<Paragraph>()) // проход по абзацам.[web:94][web:117]
-                {
-                    string text = p.InnerText;
-                    if (!string.IsNullOrWhiteSpace(text))
-                    {
-                        sb.AppendLine(text);
-                    }
-                }
-            }
-
-            return sb.ToString();
-        }
-
+       
         private async Task BlinkControlAsync(WControl ctrl)
         {
             var oldColor = ctrl.BackColor;
@@ -622,20 +438,6 @@ namespace StudentWorlsAssignment
             SystemSounds.Beep.Play(); // короткий системный звук.[web:283][web:289]
             await Task.Delay(150);
             ctrl.BackColor = oldColor;
-        }
-    }
-    public class FileItem
-    {
-        public string FullPath { get; }
-
-        public FileItem(string fullPath)
-        {
-            FullPath = fullPath;
-        }
-
-        public override string ToString()
-        {
-            return Path.GetFileName(FullPath); // в ListBox будет только имя файла.[web:181]
         }
     }
 
