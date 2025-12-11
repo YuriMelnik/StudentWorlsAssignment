@@ -16,7 +16,6 @@ namespace StudentWorlsAssignment
 {
     public partial class Form1 : Form
     {
-        protected override bool ShowFocusCues => true;
 
         private static readonly string[] CSharpKeywords =
         {
@@ -40,113 +39,37 @@ namespace StudentWorlsAssignment
 "try", "while", "with", "yield"
 };
 
-        private static readonly string[] allowedExtentions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
+        private static readonly string[] АllowedExtentions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
 ".pdf", ".doc", ".docx", ".txt", ".rtf",
 ".cs", ".xcf", ".py" };
 
-        private string _baseOutputDir;
-
-        private StudentFileService _studentFileService;
-        private readonly ArchiveExtractor _archiveExtractor = new ArchiveExtractor();
+        private readonly ArchiveExtractor _archiveExtractor = new();
         private readonly SyntaxHighlighter _syntaxHighlighter;
-        private readonly DocxTextExtractor _docxTextExtractor = new DocxTextExtractor();
+        private readonly DocxTextExtractor _docxTextExtractor = new();
+
+        private string _baseOutputDir;
+        private StudentFileService? _studentFileService;
 
         public Form1()
         {
             InitializeComponent();
 
             _syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
-            // TODO: ПО СТРЕЛКЕ ВЛЕВО ПЕРЕходить на клетку с оценкой
+
+            SubscribeToEvents();
+        }
+
+        private void SubscribeToEvents()
+        {
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
             checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
             dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
             listBoxFiles.SelectedIndexChanged += ListBoxFiles_SelectedIndexChanged;
             listBoxFiles.DoubleClick += ListBoxFiles_DoubleClick;
         }
-        private void CheckBoxSyntax_CheckedChanged(object sender, EventArgs e)
-        {
-            // перерисовать текущий выбранный файл, если есть
-            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
-            {
-                ShowFileInPanel(item.FullPath);
-            }
-        }
 
-        private async void MoveToPrevFileOrStudent()
-        {
-            // часть с listBoxFiles оставляем как есть
-            if (listBoxFiles.Items.Count > 0 &&
-                listBoxFiles.SelectedIndex > 0)
-            {
-                listBoxFiles.SelectedIndex -= 1;
-                return;
-            }
-
-            if (dataGridViewStudentvsMark.CurrentRow == null)
-            {
-                await BlinkControlAsync(listBoxFiles);
-                return;
-            }
-
-            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
-            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
-
-            if (rowIndex <= 0)
-            {
-                await BlinkControlAsync(dataGridViewStudentvsMark);
-                return;
-            }
-
-            int prevRowIndex = rowIndex - 1;
-
-            dataGridViewStudentvsMark.ClearSelection();
-            dataGridViewStudentvsMark.CurrentCell =
-                dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol];
-            dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol].Selected = true;
-
-            LoadFilesForCurrentStudent();
-
-            if (listBoxFiles.Items.Count > 0)
-                listBoxFiles.SelectedIndex = listBoxFiles.Items.Count - 1;
-        }
-
-        private async void MoveToNextFileOrStudent()
-        {
-            // 1) сначала листаем файлы
-            if (listBoxFiles.Items.Count > 0 &&
-                listBoxFiles.SelectedIndex >= 0 &&
-                listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
-            {
-                listBoxFiles.SelectedIndex += 1;
-                return;
-            }
-
-            if (dataGridViewStudentvsMark.CurrentRow == null)
-            {
-                await BlinkControlAsync(listBoxFiles);
-                return;
-            }
-
-            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
-            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
-
-            if (rowIndex < 0 || rowIndex >= dataGridViewStudentvsMark.Rows.Count - 2)
-            {
-                await BlinkControlAsync(dataGridViewStudentvsMark);
-                return;
-            }
-
-            int nextRowIndex = rowIndex + 1;
-
-            dataGridViewStudentvsMark.ClearSelection();
-            dataGridViewStudentvsMark.CurrentCell =
-                dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol];
-            dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
-
-            LoadFilesForCurrentStudent();
-            if (listBoxFiles.Items.Count > 0)
-                listBoxFiles.SelectedIndex = 0;
-        }
+        // Публичные/protected переопределения
+        protected override bool ShowFocusCues => true;
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -186,40 +109,22 @@ namespace StudentWorlsAssignment
                         }
                     }
                     return true;
+                case Keys.Enter:
+                    // если фокус на списке файлов – открыть как по двойному клику
+                    if (//listBoxFiles.Focused &&
+                        listBoxFiles.SelectedItem is FileItem item &&
+                        File.Exists(item.FullPath))
+                    {
+                        OpenFileInAssociatedApp(item.FullPath);
+                        return true;
+                    }
+                    break;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-
-        private void ListBoxFiles_DoubleClick(object? sender, EventArgs e)
-        {
-            if (listBoxFiles.SelectedItem is not FileItem item)
-                return;
-
-            string path = item.FullPath;
-
-            if (!File.Exists(path))
-            {
-                MessageBox.Show("Файл не найден: " + path);
-                return;
-            }
-
-            try
-            {
-                // Открыть файлы в ассоциированном приложении (Word, VS, просмотрщик PDF и т.п.).[web:160][web:171]
-                var psi = new ProcessStartInfo(path)
-                {
-                    UseShellExecute = true
-                };
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Не удалось открыть файл:\n" + ex.Message);
-            }
-        }
-
+        // Обработчики событий UI
         private void buttonLoadZip_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog
@@ -228,40 +133,75 @@ namespace StudentWorlsAssignment
                 Title = "Выберите архив с работами учеников"
             };
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            // очищаем список студентов и файлов
+            dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
+            listBoxFiles.Items.Clear();
+            ClearPreview();
+
+            string archivePath = openFileDialog.FileName;
+
+            labelArchivFileName.Text = archivePath;
+
+            _baseOutputDir = Path.Combine(
+                Path.GetDirectoryName(archivePath)!,
+                Path.GetFileNameWithoutExtension(archivePath)); // папка для всех работ[web:6]
+
+            Directory.CreateDirectory(_baseOutputDir); // если есть — не упадёт[web:12]
+
+            try
             {
-                // очищаем список студентов и файлов
-                dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
-                listBoxFiles.Items.Clear();
-                ClearPreview();
+                _archiveExtractor.ExtractPerStudent(archivePath, _baseOutputDir);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при распаковке архива: " + ex.Message);
+                return;
+            }
 
-                string archivePath = openFileDialog.FileName;
+            // создаем сервис
+            _studentFileService = new StudentFileService(_baseOutputDir, АllowedExtentions);
 
-                labelArchivFileName.Text = archivePath;
+            // здесь — уже чисто UI: заполняем таблицу студентов по папкам
+            FillStudentsFromFolders();
+        }
+        private void CheckBoxSyntax_CheckedChanged(object sender, EventArgs e)
+        {
+            // перерисовать текущий выбранный файл, если есть
+            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
+            {
+                ShowFileInPanel(item.FullPath);
+            }
+        }
+        private void DataGridViewStudentvsMark_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (_baseOutputDir == null)
+            {
+                MessageBox.Show("Сначала загрузите архив.");
+                return;
+            }
 
-                _baseOutputDir = Path.Combine(
-                    Path.GetDirectoryName(archivePath)!,
-                    Path.GetFileNameWithoutExtension(archivePath)); // папка для всех работ[web:6]
+            LoadFilesForCurrentStudent();
+        }
+        private void ListBoxFiles_DoubleClick(object? sender, EventArgs e)
+        {
+            if (listBoxFiles.SelectedItem is not FileItem item)
+                return;
 
-                Directory.CreateDirectory(_baseOutputDir); // если есть — не упадёт[web:12]
+            OpenFileInAssociatedApp( item.FullPath);
 
-                try
-                {
-                    _archiveExtractor.ExtractPerStudent(archivePath, _baseOutputDir);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при распаковке архива: " + ex.Message);
-                    return;
-                }
-
-                // здесь — уже чисто UI: заполняем таблицу студентов по папкам
-                FillStudentsFromFolders();
-                // создаем сервис
-                _studentFileService = new StudentFileService(_baseOutputDir, allowedExtentions);
+        }
+        private void ListBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
+            {
+                ShowFileInPanel(item.FullPath);
             }
         }
 
+        // Загрузка данных
         private void FillStudentsFromFolders()
         {
             dataGridViewStudentvsMark.Rows.Clear();
@@ -279,14 +219,28 @@ namespace StudentWorlsAssignment
             }
             if (dataGridViewStudentvsMark.Rows.Count > 0)
             {
+                // выбираем первого студента
                 dataGridViewStudentvsMark.ClearSelection();
-                dataGridViewStudentvsMark.CurrentCell = dataGridViewStudentvsMark.Rows[0].Cells[0];
-                dataGridViewStudentvsMark.Rows[0].Selected = true;
+                var firstRow = dataGridViewStudentvsMark.Rows[0];
+
+                dataGridViewStudentvsMark.CurrentCell = firstRow.Cells[0];
+                firstRow.Cells[0].Selected = true;
+
+                // ставим фокус в таблицу
+                dataGridViewStudentvsMark.Focus();
+
+                // загружаем файлы и показываем первый
                 LoadFilesForCurrentStudent();
+
+                if (listBoxFiles.Items.Count > 0 &&
+                    listBoxFiles.SelectedIndex >= 0 &&
+                    listBoxFiles.SelectedItem is FileItem item &&
+                    File.Exists(item.FullPath))
+                {
+                    ShowFileInPanel(item.FullPath);
+                }
             }
         }
-
-
         private void LoadFilesForCurrentStudent()
         {
             if (dataGridViewStudentvsMark.CurrentRow == null)
@@ -302,7 +256,6 @@ namespace StudentWorlsAssignment
 
             LoadStudentFilesToListBox(studentName);
         }
-
         private void LoadStudentFilesToListBox(string studentName)
         {
             listBoxFiles.Items.Clear();
@@ -335,6 +288,83 @@ namespace StudentWorlsAssignment
 
         }
 
+        // Навигация по студентам/файлам
+        private async void MoveToPrevFileOrStudent()
+        {
+            // часть с listBoxFiles оставляем как есть
+            if (listBoxFiles.Items.Count > 0 &&
+                listBoxFiles.SelectedIndex > 0)
+            {
+                listBoxFiles.SelectedIndex -= 1;
+                return;
+            }
+
+            if (dataGridViewStudentvsMark.CurrentRow == null)
+            {
+                await BlinkControlAsync(listBoxFiles);
+                return;
+            }
+
+            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
+            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+
+            if (rowIndex <= 0)
+            {
+                await BlinkControlAsync(dataGridViewStudentvsMark);
+                return;
+            }
+
+            int prevRowIndex = rowIndex - 1;
+
+            dataGridViewStudentvsMark.ClearSelection();
+            dataGridViewStudentvsMark.CurrentCell =
+                dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol];
+            dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol].Selected = true;
+
+            LoadFilesForCurrentStudent();
+
+            if (listBoxFiles.Items.Count > 0)
+                listBoxFiles.SelectedIndex = listBoxFiles.Items.Count - 1;
+        }
+        private async void MoveToNextFileOrStudent()
+        {
+            // 1) сначала листаем файлы
+            if (listBoxFiles.Items.Count > 0 &&
+                listBoxFiles.SelectedIndex >= 0 &&
+                listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
+            {
+                listBoxFiles.SelectedIndex += 1;
+                return;
+            }
+
+            if (dataGridViewStudentvsMark.CurrentRow == null)
+            {
+                await BlinkControlAsync(listBoxFiles);
+                return;
+            }
+
+            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
+            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+
+            if (rowIndex < 0 || rowIndex >= dataGridViewStudentvsMark.Rows.Count - 2)
+            {
+                await BlinkControlAsync(dataGridViewStudentvsMark);
+                return;
+            }
+
+            int nextRowIndex = rowIndex + 1;
+
+            dataGridViewStudentvsMark.ClearSelection();
+            dataGridViewStudentvsMark.CurrentCell =
+                dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol];
+            dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
+
+            LoadFilesForCurrentStudent();
+            if (listBoxFiles.Items.Count > 0)
+                listBoxFiles.SelectedIndex = 0;
+        }
+
+        // Предпросмотр файлов
         private void ShowFileInPanel(string filePath)
         {
             ClearPreview();
@@ -352,7 +382,7 @@ namespace StudentWorlsAssignment
                 };
                 panelPreview.Controls.Add(pb); // вывод изображения в панели.[web:1][web:2]
             }
-            
+
             else if (ext == ".docx") // || ext == )
             {
                 var rtb = new RichTextBox
@@ -405,26 +435,6 @@ namespace StudentWorlsAssignment
                 panelPreview.Controls.Add(rtb);
             }
         }
-
-        private void DataGridViewStudentvsMark_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (_baseOutputDir == null)
-            {
-                MessageBox.Show("Сначала загрузите архив.");
-                return;
-            }
-
-            LoadFilesForCurrentStudent();
-        }
-
-        private void ListBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
-            {
-                ShowFileInPanel(item.FullPath);
-            }
-        }
-
         private void ClearPreview()
         {
             foreach (System.Windows.Forms.Control ctrl in panelPreview.Controls)
@@ -440,6 +450,28 @@ namespace StudentWorlsAssignment
             panelPreview.Controls.Clear();
         }
 
+        // Прочие вспомогательные методы
+        private void OpenFileInAssociatedApp(string path)
+        {
+            if (!File.Exists(path))
+            {
+                MessageBox.Show("Файл не найден: " + path);
+                return;
+            }
+
+            try
+            {
+                var psi = new ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Не удалось открыть файл:\n" + ex.Message);
+            }
+        }
 
         private async Task BlinkControlAsync(WControl ctrl)
         {
@@ -452,7 +484,3 @@ namespace StudentWorlsAssignment
     }
 
 }
-
-
-
-
