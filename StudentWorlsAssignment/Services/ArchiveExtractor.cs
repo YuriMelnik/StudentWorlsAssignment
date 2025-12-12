@@ -34,7 +34,11 @@ namespace StudentWorlsAssignment.Services
 
         private void ExtractRarPerStudent(string archivePath, string baseOutputDir)
         {
-            using var archive = RarArchive.Open(archivePath);
+            string tempRarPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".rar");
+            File.Copy(archivePath, tempRarPath, overwrite: true);
+
+            using var archive = RarArchive.Open(tempRarPath);
+            //using var archive = RarArchive.Open(archivePath);
 
             foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
             {
@@ -55,7 +59,15 @@ namespace StudentWorlsAssignment.Services
                     Overwrite = true
                 });
             }
-
+            // delete temp copy
+            try
+            {
+                File.Delete(tempRarPath);
+            }
+            catch
+            {
+                // если не удалился — не критично
+            }
         }
 
         private void ExtractZipPerStudent(string archivePath, string baseOutputDir)
@@ -82,7 +94,7 @@ namespace StudentWorlsAssignment.Services
                 if (innerExt == ".zip")
                 {
                     ZipFile.ExtractToDirectory(tempPath, studentFolder, overwriteFiles: true);
-                    File.Delete(tempPath);
+                    TryDeleteFile(tempPath);
                 }
                 else if (innerExt == ".rar")
                 {
@@ -95,7 +107,7 @@ namespace StudentWorlsAssignment.Services
                             Overwrite = true
                         });
                     }
-                    File.Delete(tempPath);
+                    TryDeleteFile(tempPath);
                 }
                 else
                 {
@@ -106,6 +118,30 @@ namespace StudentWorlsAssignment.Services
                 }
             }
         }
-    
+        private void TryDeleteFile(string path, int retries = 3, int delayMs = 100)
+        {
+            for (int i = 0; i < retries; i++)
+            {
+                try
+                {
+                    if (File.Exists(path))
+                        File.Delete(path);
+                    return;
+                }
+                catch (IOException)
+                {
+                    if (i == retries - 1)
+                        return; // сдаёмся тихо
+                    Thread.Sleep(delayMs);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    if (i == retries - 1)
+                        return;
+                    Thread.Sleep(delayMs);
+                }
+            }
+        }
+
     }
 }
