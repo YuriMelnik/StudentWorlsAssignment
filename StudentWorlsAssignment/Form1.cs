@@ -48,7 +48,7 @@ namespace StudentWorlsAssignment
         private readonly DocxTextExtractor _docxTextExtractor = new();
         private readonly AiCodeReviewService _aiCodeReviewService;
 
-        private string _baseOutputDir;
+        private string _baseOutputDir = string.Empty;
         private StudentFileService? _studentFileService;
 
         public Form1()
@@ -171,7 +171,7 @@ namespace StudentWorlsAssignment
             // здесь — уже чисто UI: заполняем таблицу студентов по папкам
             FillStudentsFromFolders();
         }
-        private void CheckBoxSyntax_CheckedChanged(object sender, EventArgs e)
+        private void CheckBoxSyntax_CheckedChanged(object? sender, EventArgs e)
         {
             // перерисовать текущий выбранный файл, если есть
             if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
@@ -179,7 +179,7 @@ namespace StudentWorlsAssignment
                 ShowFileInPanel(item.FullPath);
             }
         }
-        private void DataGridViewStudentvsMark_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void DataGridViewStudentvsMark_CellContentClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (_baseOutputDir == null)
             {
@@ -197,7 +197,7 @@ namespace StudentWorlsAssignment
             OpenFileInAssociatedApp(item.FullPath);
 
         }
-        private void ListBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListBoxFiles_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
             {
@@ -286,7 +286,7 @@ namespace StudentWorlsAssignment
             if (cellValue == null)
                 return;
 
-            string studentName = cellValue.ToString();
+            string studentName = cellValue.ToString() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(studentName))
                 return;
 
