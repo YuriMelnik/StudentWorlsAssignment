@@ -46,6 +46,7 @@ namespace StudentWorlsAssignment
         private readonly ArchiveExtractor _archiveExtractor = new();
         private readonly SyntaxHighlighter _syntaxHighlighter;
         private readonly DocxTextExtractor _docxTextExtractor = new();
+        private readonly AiCodeReviewService _aiCodeReviewService;
 
         private string _baseOutputDir;
         private StudentFileService? _studentFileService;
@@ -54,14 +55,17 @@ namespace StudentWorlsAssignment
         {
             InitializeComponent();
 
+            var httpClient = new HttpClient();
+            _aiCodeReviewService = new AiCodeReviewService(httpClient);
+
             _syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
+            this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
 
             SubscribeToEvents();
         }
 
         private void SubscribeToEvents()
         {
-            this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
             checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
             dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
             listBoxFiles.SelectedIndexChanged += ListBoxFiles_SelectedIndexChanged;
@@ -190,7 +194,7 @@ namespace StudentWorlsAssignment
             if (listBoxFiles.SelectedItem is not FileItem item)
                 return;
 
-            OpenFileInAssociatedApp( item.FullPath);
+            OpenFileInAssociatedApp(item.FullPath);
 
         }
         private void ListBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
@@ -200,6 +204,38 @@ namespace StudentWorlsAssignment
                 ShowFileInPanel(item.FullPath);
             }
         }
+        private async void buttonAiReview_Click(object sender, EventArgs e)
+        {
+            if (panelPreview.Controls.OfType<RichTextBox>().FirstOrDefault() is not RichTextBox rtb)
+            {
+                MessageBox.Show("Сначала выберите текстовый файл или DOCX с кодом.");
+                return;
+            }
+
+            string code = rtb.Text;
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                MessageBox.Show("Текст для анализа пуст.");
+                return;
+            }
+
+            buttonAiReview.Enabled = false;
+
+            try
+            {
+                string feedback = await _aiCodeReviewService.ReviewAsync(code);
+                ShowAiFeedback(feedback);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при запросе к AI-помощнику:\n" + ex.Message);
+            }
+            finally
+            {
+                buttonAiReview.Enabled = true;
+            }
+        }
+
 
         // Загрузка данных
         private void FillStudentsFromFolders()
@@ -286,6 +322,29 @@ namespace StudentWorlsAssignment
             if (listBoxFiles.Items.Count > 0)
                 listBoxFiles.SelectedIndex = 0;
 
+        }
+
+        private void ShowAiFeedback(string feedback)
+        {
+            var form = new Form
+            {
+                Text = "AI-отзыв по коду",
+                StartPosition = FormStartPosition.CenterParent,
+                Width = 800,
+                Height = 600
+            };
+
+            var rtb = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                Font = new WinFont("Consolas", 10),
+                WordWrap = true,
+                Text = feedback
+            };
+
+            form.Controls.Add(rtb);
+            form.ShowDialog(this);
         }
 
         // Навигация по студентам/файлам
@@ -481,6 +540,8 @@ namespace StudentWorlsAssignment
             await Task.Delay(150);
             ctrl.BackColor = oldColor;
         }
+
+
     }
 
 }

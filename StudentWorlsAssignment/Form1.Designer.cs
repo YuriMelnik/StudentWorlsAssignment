@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             Button button1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             panelPreview = new Panel();
             dataGridViewStudentvsMark = new DataGridView();
             Student = new DataGridViewTextBoxColumn();
@@ -39,6 +40,8 @@
             label2 = new Label();
             checkBoxSyntax = new CheckBox();
             labelArchivFileName = new Label();
+            buttonAiReview = new Button();
+            buttonProperties = new Button();
             button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).BeginInit();
             SuspendLayout();
@@ -46,14 +49,15 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button1.BackColor = SystemColors.ButtonHighlight;
             button1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            button1.Location = new Point(813, 139);
+            button1.Location = new Point(835, 139);
             button1.Name = "button1";
             button1.RightToLeft = RightToLeft.Yes;
-            button1.Size = new Size(121, 56);
+            button1.Size = new Size(101, 56);
             button1.TabIndex = 1;
             button1.Text = "Загрузить архив \r\n    с работами";
-            button1.UseVisualStyleBackColor = true;
+            button1.UseVisualStyleBackColor = false;
             button1.Click += buttonLoadZip_Click;
             // 
             // panelPreview
@@ -100,7 +104,7 @@
             textBox2.ForeColor = SystemColors.WindowFrame;
             textBox2.Location = new Point(547, 12);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(387, 29);
+            textBox2.Size = new Size(362, 29);
             textBox2.TabIndex = 4;
             textBox2.Text = "Задание для нейропомощника";
             // 
@@ -151,18 +155,46 @@
             labelArchivFileName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelArchivFileName.AutoSize = true;
             labelArchivFileName.ForeColor = SystemColors.HotTrack;
-            labelArchivFileName.Location = new Point(544, 107);
+            labelArchivFileName.Location = new Point(544, 104);
             labelArchivFileName.MaximumSize = new Size(387, 0);
             labelArchivFileName.Name = "labelArchivFileName";
             labelArchivFileName.Size = new Size(276, 15);
             labelArchivFileName.TabIndex = 9;
             labelArchivFileName.Text = "полное имя архива - загрузите архив с ответами!";
             // 
+            // buttonAiReview
+            // 
+            buttonAiReview.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonAiReview.BackColor = SystemColors.GradientInactiveCaption;
+            buttonAiReview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            buttonAiReview.ForeColor = SystemColors.HotTrack;
+            buttonAiReview.Location = new Point(835, 98);
+            buttonAiReview.Name = "buttonAiReview";
+            buttonAiReview.Size = new Size(99, 35);
+            buttonAiReview.TabIndex = 10;
+            buttonAiReview.Text = "AI-проверка";
+            buttonAiReview.UseVisualStyleBackColor = false;
+            buttonAiReview.Click += buttonAiReview_Click;
+            // 
+            // buttonProperties
+            // 
+            buttonProperties.BackColor = SystemColors.ButtonFace;
+            buttonProperties.BackgroundImage = Properties.Resources.settings100;
+            buttonProperties.BackgroundImageLayout = ImageLayout.Stretch;
+            buttonProperties.Image = Properties.Resources.settings100;
+            buttonProperties.Location = new Point(913, 16);
+            buttonProperties.Name = "buttonProperties";
+            buttonProperties.Size = new Size(22, 22);
+            buttonProperties.TabIndex = 11;
+            buttonProperties.UseVisualStyleBackColor = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(946, 538);
+            Controls.Add(buttonProperties);
+            Controls.Add(buttonAiReview);
             Controls.Add(labelArchivFileName);
             Controls.Add(checkBoxSyntax);
             Controls.Add(label2);
@@ -172,6 +204,7 @@
             Controls.Add(dataGridViewStudentvsMark);
             Controls.Add(button1);
             Controls.Add(panelPreview);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Form1";
             Text = "Помощник  проверки заданий";
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).EndInit();
@@ -192,5 +225,7 @@
         private Label label2;
         private CheckBox checkBoxSyntax;
         private Label labelArchivFileName;
+        private Button buttonAiReview;
+        private Button buttonProperties;
     }
 }
