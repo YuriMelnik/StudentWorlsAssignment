@@ -52,7 +52,7 @@
             button1.BackColor = SystemColors.ButtonHighlight;
             button1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             button1.Location = new Point(1551, 297);
-            button1.Margin = new Padding(6, 6, 6, 6);
+            button1.Margin = new Padding(6);
             button1.Name = "button1";
             button1.RightToLeft = RightToLeft.Yes;
             button1.Size = new Size(188, 119);
@@ -66,7 +66,7 @@
             panelPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelPreview.BackgroundImageLayout = ImageLayout.Stretch;
             panelPreview.Location = new Point(22, 26);
-            panelPreview.Margin = new Padding(6, 6, 6, 6);
+            panelPreview.Margin = new Padding(6);
             panelPreview.Name = "panelPreview";
             panelPreview.Size = new Size(982, 954);
             panelPreview.TabIndex = 0;
@@ -79,7 +79,7 @@
             dataGridViewStudentvsMark.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewStudentvsMark.Columns.AddRange(new DataGridViewColumn[] { Student, Mark });
             dataGridViewStudentvsMark.Location = new Point(1016, 429);
-            dataGridViewStudentvsMark.Margin = new Padding(6, 6, 6, 6);
+            dataGridViewStudentvsMark.Margin = new Padding(6);
             dataGridViewStudentvsMark.MultiSelect = false;
             dataGridViewStudentvsMark.Name = "dataGridViewStudentvsMark";
             dataGridViewStudentvsMark.RowHeadersWidth = 82;
@@ -107,9 +107,9 @@
             // 
             textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             textBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox2.ForeColor = SystemColors.WindowFrame;
+            textBox2.ForeColor = SystemColors.ActiveCaption;
             textBox2.Location = new Point(1016, 26);
-            textBox2.Margin = new Padding(6, 6, 6, 6);
+            textBox2.Margin = new Padding(6);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(669, 50);
             textBox2.TabIndex = 4;
@@ -120,7 +120,7 @@
             listBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBoxFiles.FormattingEnabled = true;
             listBoxFiles.Location = new Point(22, 992);
-            listBoxFiles.Margin = new Padding(6, 6, 6, 6);
+            listBoxFiles.Margin = new Padding(6);
             listBoxFiles.Name = "listBoxFiles";
             listBoxFiles.Size = new Size(973, 132);
             listBoxFiles.TabIndex = 5;
@@ -151,9 +151,11 @@
             // 
             checkBoxSyntax.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBoxSyntax.AutoSize = true;
+            checkBoxSyntax.Checked = true;
+            checkBoxSyntax.CheckState = CheckState.Checked;
             checkBoxSyntax.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            checkBoxSyntax.Location = new Point(981, 378);
-            checkBoxSyntax.Margin = new Padding(6, 6, 6, 6);
+            checkBoxSyntax.Location = new Point(1024, 378);
+            checkBoxSyntax.Margin = new Padding(6);
             checkBoxSyntax.Name = "checkBoxSyntax";
             checkBoxSyntax.Size = new Size(406, 36);
             checkBoxSyntax.TabIndex = 0;
@@ -180,7 +182,7 @@
             buttonAiReview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             buttonAiReview.ForeColor = SystemColors.HotTrack;
             buttonAiReview.Location = new Point(1551, 209);
-            buttonAiReview.Margin = new Padding(6, 6, 6, 6);
+            buttonAiReview.Margin = new Padding(6);
             buttonAiReview.Name = "buttonAiReview";
             buttonAiReview.Size = new Size(184, 75);
             buttonAiReview.TabIndex = 10;
@@ -195,7 +197,7 @@
             buttonProperties.BackgroundImageLayout = ImageLayout.Stretch;
             buttonProperties.Image = Properties.Resources.settings;
             buttonProperties.Location = new Point(1692, 32);
-            buttonProperties.Margin = new Padding(6, 6, 6, 6);
+            buttonProperties.Margin = new Padding(6);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(47, 47);
             buttonProperties.TabIndex = 11;
@@ -218,7 +220,7 @@
             Controls.Add(button1);
             Controls.Add(panelPreview);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(6, 6, 6, 6);
+            Margin = new Padding(6);
             Name = "Form1";
             Text = "Помощник  проверки заданий";
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).EndInit();

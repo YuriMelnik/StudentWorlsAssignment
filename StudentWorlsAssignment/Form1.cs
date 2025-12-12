@@ -286,7 +286,7 @@ namespace StudentWorlsAssignment
             if (cellValue == null)
                 return;
 
-            string studentName = cellValue.ToString() ?? string.Empty;
+            string studentName = cellValue?.ToString() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(studentName))
                 return;
 
