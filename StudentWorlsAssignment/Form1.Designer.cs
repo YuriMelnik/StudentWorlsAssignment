@@ -176,23 +176,22 @@
             // rbNoHighlight
             // 
             rbNoHighlight.AutoSize = true;
-            rbNoHighlight.Checked = true;
             rbNoHighlight.Location = new Point(147, -2);
             rbNoHighlight.Name = "rbNoHighlight";
             rbNoHighlight.Size = new Size(109, 19);
             rbNoHighlight.TabIndex = 12;
-            rbNoHighlight.TabStop = true;
             rbNoHighlight.Text = "без подсветки";
             rbNoHighlight.UseVisualStyleBackColor = true;
             rbNoHighlight.CheckedChanged += rbHighlightMode_CheckedChanged;
             // 
             // groupBoxHighLighting
             // 
+            groupBoxHighLighting.BackColor = SystemColors.ActiveCaption;
             groupBoxHighLighting.Controls.Add(rbPython);
             groupBoxHighLighting.Controls.Add(rbCSharp);
             groupBoxHighLighting.Controls.Add(rbNoHighlight);
             groupBoxHighLighting.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            groupBoxHighLighting.ForeColor = SystemColors.Highlight;
+            groupBoxHighLighting.ForeColor = SystemColors.ControlLightLight;
             groupBoxHighLighting.Location = new Point(566, 176);
             groupBoxHighLighting.Name = "groupBoxHighLighting";
             groupBoxHighLighting.Size = new Size(370, 19);
@@ -214,10 +213,12 @@
             // rbCSharp
             // 
             rbCSharp.AutoSize = true;
+            rbCSharp.Checked = true;
             rbCSharp.Location = new Point(258, -2);
             rbCSharp.Name = "rbCSharp";
             rbCSharp.Size = new Size(39, 19);
             rbCSharp.TabIndex = 13;
+            rbCSharp.TabStop = true;
             rbCSharp.Text = "C#";
             rbCSharp.UseVisualStyleBackColor = true;
             rbCSharp.CheckedChanged += rbHighlightMode_CheckedChanged;

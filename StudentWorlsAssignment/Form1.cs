@@ -1,4 +1,4 @@
-using DocumentFormat.OpenXml.Packaging;
+п»їusing DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using StudentWorlsAssignment.Models;
 using StudentWorlsAssignment.Services;
@@ -36,7 +36,7 @@ namespace StudentWorlsAssignment
             "nonlocal", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"
         ];
 
-        private static readonly string[] АllowedExtentions =
+        private static readonly string[] РђllowedExtentions =
         [
             ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".pdf", ".doc", ".docx", ".txt", ".rtf", ".cs", ".sln", ".xcf",
             ".py"
@@ -63,7 +63,7 @@ namespace StudentWorlsAssignment
             _aiCodeReviewService = new AiCodeReviewService(httpClient);
 
             //_syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
-            this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
+            this.KeyPreview = true; // С‡С‚РѕР±С‹ С„РѕСЂРјР° РїРѕР»СѓС‡Р°Р»Р° РєР»Р°РІРёС€Рё РїРµСЂРІРѕР№.[web:271]
 
             SubscribeToEvents();
         }
@@ -76,7 +76,7 @@ namespace StudentWorlsAssignment
             listBoxFiles.DoubleClick += ListBoxFiles_DoubleClick;
         }
 
-        // Публичные/protected переопределения
+        // РџСѓР±Р»РёС‡РЅС‹Рµ/protected РїРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёСЏ
         protected override bool ShowFocusCues => true;
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -94,21 +94,21 @@ namespace StudentWorlsAssignment
                     {
                         dataGridViewStudentvsMark.Focus();
                         dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[0]; // имя студента
+                            dataGridViewStudentvsMark.CurrentRow.Cells[0]; // РёРјСЏ СЃС‚СѓРґРµРЅС‚Р°
                     }
                     return true;
 
                 case Keys.Right:
-                    // сначала оценка
+                    // СЃРЅР°С‡Р°Р»Р° РѕС†РµРЅРєР°
                     if (dataGridViewStudentvsMark.Focused &&
                         dataGridViewStudentvsMark.CurrentRow != null)
                     {
                         dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[1]; // оценка
+                            dataGridViewStudentvsMark.CurrentRow.Cells[1]; // РѕС†РµРЅРєР°
                     }
                     else
                     {
-                        // потом список файлов
+                        // РїРѕС‚РѕРј СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ
                         if (listBoxFiles.Items.Count > 0)
                         {
                             listBoxFiles.Focus();
@@ -118,7 +118,7 @@ namespace StudentWorlsAssignment
                     }
                     return true;
                 case Keys.Enter:
-                    // если фокус на списке файлов – открыть как по двойному клику
+                    // РµСЃР»Рё С„РѕРєСѓСЃ РЅР° СЃРїРёСЃРєРµ С„Р°Р№Р»РѕРІ вЂ“ РѕС‚РєСЂС‹С‚СЊ РєР°Рє РїРѕ РґРІРѕР№РЅРѕРјСѓ РєР»РёРєСѓ
                     if (//listBoxFiles.Focused &&
                         listBoxFiles.SelectedItem is FileItem item &&
                         File.Exists(item.FullPath))
@@ -132,20 +132,20 @@ namespace StudentWorlsAssignment
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        // Обработчики событий UI
+        // РћР±СЂР°Р±РѕС‚С‡РёРєРё СЃРѕР±С‹С‚РёР№ UI
         private void buttonLoadZip_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog
             {
-                Filter = "ZIP архивы (*.zip)|*.zip",
-                Title = "Выберите архив с работами учеников"
+                Filter = "ZIP Р°СЂС…РёРІС‹ (*.zip)|*.zip",
+                Title = "Р’С‹Р±РµСЂРёС‚Рµ Р°СЂС…РёРІ СЃ СЂР°Р±РѕС‚Р°РјРё СѓС‡РµРЅРёРєРѕРІ"
             };
 
             if (openFileDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            // очищаем список студентов и файлов
-            dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
+            // РѕС‡РёС‰Р°РµРј СЃРїРёСЃРѕРє СЃС‚СѓРґРµРЅС‚РѕРІ Рё С„Р°Р№Р»РѕРІ
+            dataGridViewStudentvsMark.Rows.Clear(); // СѓР±СЂР°С‚СЊ СЃС‚Р°СЂС‹Рµ СЃС‚СЂРѕРєРё.[web:195]
             listBoxFiles.Items.Clear();
             ClearPreview();
 
@@ -155,9 +155,9 @@ namespace StudentWorlsAssignment
 
             _baseOutputDir = Path.Combine(
                 Path.GetDirectoryName(archivePath)!,
-                Path.GetFileNameWithoutExtension(archivePath)); // папка для всех работ[web:6]
+                Path.GetFileNameWithoutExtension(archivePath)); // РїР°РїРєР° РґР»СЏ РІСЃРµС… СЂР°Р±РѕС‚[web:6]
 
-            Directory.CreateDirectory(_baseOutputDir); // если есть — не упадёт[web:12]
+            Directory.CreateDirectory(_baseOutputDir); // РµСЃР»Рё РµСЃС‚СЊ вЂ” РЅРµ СѓРїР°РґС‘С‚[web:12]
 
             try
             {
@@ -165,19 +165,19 @@ namespace StudentWorlsAssignment
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при распаковке архива: " + ex.Message);
+                MessageBox.Show("РћС€РёР±РєР° РїСЂРё СЂР°СЃРїР°РєРѕРІРєРµ Р°СЂС…РёРІР°: " + ex.Message);
                 return;
             }
 
-            // создаем сервис
-            _studentFileService = new StudentFileService(_baseOutputDir, АllowedExtentions);
+            // СЃРѕР·РґР°РµРј СЃРµСЂРІРёСЃ
+            _studentFileService = new StudentFileService(_baseOutputDir, РђllowedExtentions);
 
-            // здесь — уже чисто UI: заполняем таблицу студентов по папкам
+            // Р·РґРµСЃСЊ вЂ” СѓР¶Рµ С‡РёСЃС‚Рѕ UI: Р·Р°РїРѕР»РЅСЏРµРј С‚Р°Р±Р»РёС†Сѓ СЃС‚СѓРґРµРЅС‚РѕРІ РїРѕ РїР°РїРєР°Рј
             FillStudentsFromFolders();
         }
         private void CheckBoxSyntax_CheckedChanged(object? sender, EventArgs e)
         {
-            // перерисовать текущий выбранный файл, если есть
+            // РїРµСЂРµСЂРёСЃРѕРІР°С‚СЊ С‚РµРєСѓС‰РёР№ РІС‹Р±СЂР°РЅРЅС‹Р№ С„Р°Р№Р», РµСЃР»Рё РµСЃС‚СЊ
             if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
             {
                 ShowFileInPanel(item.FullPath);
@@ -187,7 +187,7 @@ namespace StudentWorlsAssignment
         {
             if (_baseOutputDir == null)
             {
-                MessageBox.Show("Сначала загрузите архив.");
+                MessageBox.Show("РЎРЅР°С‡Р°Р»Р° Р·Р°РіСЂСѓР·РёС‚Рµ Р°СЂС…РёРІ.");
                 return;
             }
 
@@ -212,14 +212,14 @@ namespace StudentWorlsAssignment
         {
             if (panelPreview.Controls.OfType<RichTextBox>().FirstOrDefault() is not RichTextBox rtb)
             {
-                MessageBox.Show("Сначала выберите текстовый файл или DOCX с кодом.");
+                MessageBox.Show("РЎРЅР°С‡Р°Р»Р° РІС‹Р±РµСЂРёС‚Рµ С‚РµРєСЃС‚РѕРІС‹Р№ С„Р°Р№Р» РёР»Рё DOCX СЃ РєРѕРґРѕРј.");
                 return;
             }
 
             string code = rtb.Text;
             if (string.IsNullOrWhiteSpace(code))
             {
-                MessageBox.Show("Текст для анализа пуст.");
+                MessageBox.Show("РўРµРєСЃС‚ РґР»СЏ Р°РЅР°Р»РёР·Р° РїСѓСЃС‚.");
                 return;
             }
 
@@ -232,7 +232,7 @@ namespace StudentWorlsAssignment
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при запросе к AI-помощнику:\n" + ex.Message);
+                MessageBox.Show("РћС€РёР±РєР° РїСЂРё Р·Р°РїСЂРѕСЃРµ Рє AI-РїРѕРјРѕС‰РЅРёРєСѓ:\n" + ex.Message);
             }
             finally
             {
@@ -241,7 +241,7 @@ namespace StudentWorlsAssignment
         }
 
 
-        // Загрузка данных
+        // Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С…
         private void FillStudentsFromFolders()
         {
             dataGridViewStudentvsMark.Rows.Clear();
@@ -259,17 +259,17 @@ namespace StudentWorlsAssignment
             }
             if (dataGridViewStudentvsMark.Rows.Count > 0)
             {
-                // выбираем первого студента
+                // РІС‹Р±РёСЂР°РµРј РїРµСЂРІРѕРіРѕ СЃС‚СѓРґРµРЅС‚Р°
                 dataGridViewStudentvsMark.ClearSelection();
                 var firstRow = dataGridViewStudentvsMark.Rows[0];
 
                 dataGridViewStudentvsMark.CurrentCell = firstRow.Cells[0];
                 firstRow.Cells[0].Selected = true;
 
-                // ставим фокус в таблицу
+                // СЃС‚Р°РІРёРј С„РѕРєСѓСЃ РІ С‚Р°Р±Р»РёС†Сѓ
                 dataGridViewStudentvsMark.Focus();
 
-                // загружаем файлы и показываем первый
+                // Р·Р°РіСЂСѓР¶Р°РµРј С„Р°Р№Р»С‹ Рё РїРѕРєР°Р·С‹РІР°РµРј РїРµСЂРІС‹Р№
                 LoadFilesForCurrentStudent();
 
                 if (listBoxFiles.Items.Count > 0 &&
@@ -306,14 +306,14 @@ namespace StudentWorlsAssignment
 
             if (!_studentFileService.TryGetStudentfiles(studentName, out var files))
             {
-                // нет папки или нет файлов — аккуратно показали сообщение
+                // РЅРµС‚ РїР°РїРєРё РёР»Рё РЅРµС‚ С„Р°Р№Р»РѕРІ вЂ” Р°РєРєСѓСЂР°С‚РЅРѕ РїРѕРєР°Р·Р°Р»Рё СЃРѕРѕР±С‰РµРЅРёРµ
                 var textBox = new TextBox
                 {
                     Dock = DockStyle.Fill,
                     Multiline = true,
                     ReadOnly = true,
                     Font = new WinFont("Segoe UI", 12),
-                    Text = "Для этого студента нет найденных файлов ответа."
+                    Text = "Р”Р»СЏ СЌС‚РѕРіРѕ СЃС‚СѓРґРµРЅС‚Р° РЅРµС‚ РЅР°Р№РґРµРЅРЅС‹С… С„Р°Р№Р»РѕРІ РѕС‚РІРµС‚Р°."
                 };
                 panelPreview.Controls.Add(textBox);
                 return;
@@ -332,7 +332,7 @@ namespace StudentWorlsAssignment
         {
             var form = new Form
             {
-                Text = "AI-отзыв по коду",
+                Text = "AI-РѕС‚Р·С‹РІ РїРѕ РєРѕРґСѓ",
                 StartPosition = FormStartPosition.CenterParent,
                 Width = 800,
                 Height = 600
@@ -351,10 +351,10 @@ namespace StudentWorlsAssignment
             form.ShowDialog(this);
         }
 
-        // Навигация по студентам/файлам
+        // РќР°РІРёРіР°С†РёСЏ РїРѕ СЃС‚СѓРґРµРЅС‚Р°Рј/С„Р°Р№Р»Р°Рј
         private async void MoveToPrevFileOrStudent()
         {
-            // часть с listBoxFiles оставляем как есть
+            // С‡Р°СЃС‚СЊ СЃ listBoxFiles РѕСЃС‚Р°РІР»СЏРµРј РєР°Рє РµСЃС‚СЊ
             if (listBoxFiles.Items.Count > 0 &&
                 listBoxFiles.SelectedIndex > 0)
             {
@@ -391,7 +391,7 @@ namespace StudentWorlsAssignment
         }
         private async void MoveToNextFileOrStudent()
         {
-            // 1) сначала листаем файлы
+            // 1) СЃРЅР°С‡Р°Р»Р° Р»РёСЃС‚Р°РµРј С„Р°Р№Р»С‹
             if (listBoxFiles.Items.Count > 0 &&
                 listBoxFiles.SelectedIndex >= 0 &&
                 listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
@@ -427,7 +427,7 @@ namespace StudentWorlsAssignment
                 listBoxFiles.SelectedIndex = 0;
         }
 
-        // Предпросмотр файлов
+        // РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ С„Р°Р№Р»РѕРІ
         private void ShowFileInPanel(string filePath)
         {
             ClearPreview();
@@ -454,8 +454,8 @@ namespace StudentWorlsAssignment
                 BackgroundImage = Properties.Resources.chess800,
                 Image = Image.FromFile(filePath)
             };
-            panelPreview.Controls.Add(pb); // вывод изображения в панели.[web:1][web:2]
-            _previewRtb = null; // сейчас нет текстового предпросмотра
+            panelPreview.Controls.Add(pb); // РІС‹РІРѕРґ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РїР°РЅРµР»Рё.[web:1][web:2]
+            _previewRtb = null; // СЃРµР№С‡Р°СЃ РЅРµС‚ С‚РµРєСЃС‚РѕРІРѕРіРѕ РїСЂРµРґРїСЂРѕСЃРјРѕС‚СЂР°
         }
 
         private void ShowDocumentPreview(string filePath, string ext)
@@ -479,11 +479,11 @@ namespace StudentWorlsAssignment
             }
             else if (ext == ".doc" || ext == ".pdf")
             {
-                rtb.Text = "\t\tПросмотр невозможен. \nОткройте двойным кликом этот файл во нешнем приложении";
+                rtb.Text = "\t\tРџСЂРѕСЃРјРѕС‚СЂ РЅРµРІРѕР·РјРѕР¶РµРЅ. \nРћС‚РєСЂРѕР№С‚Рµ РґРІРѕР№РЅС‹Рј РєР»РёРєРѕРј СЌС‚РѕС‚ С„Р°Р№Р» РІРѕ РЅРµС€РЅРµРј РїСЂРёР»РѕР¶РµРЅРёРё";
             }
             else
             {
-                rtb.Text = File.ReadAllText(filePath); // показ содержимого текстового/CS файла.[web:16]
+                rtb.Text = ReadTextWithUTF8orANSI(filePath); // РїРѕРєР°Р· СЃРѕРґРµСЂР¶РёРјРѕРіРѕ С‚РµРєСЃС‚РѕРІРѕРіРѕ/CS С„Р°Р№Р»Р°.[web:16]
             }
             panelPreview.Controls.Add(rtb);
             _previewRtb = rtb;
@@ -491,24 +491,25 @@ namespace StudentWorlsAssignment
             ApplyHighlightingForCurrentFile(ext);
         }
 
+
         private void ApplyHighlightingForCurrentFile(string ext)
         {
-            // Нечего подсвечивать
+            // РќРµС‡РµРіРѕ РїРѕРґСЃРІРµС‡РёРІР°С‚СЊ
             if (_previewRtb is null)
                 return;
 
-            // Режим "без подсветки"
+            // Р РµР¶РёРј "Р±РµР· РїРѕРґСЃРІРµС‚РєРё"
             if (rbNoHighlight.Checked)
                 return;
 
-            // Сбросить предыдущее форматирование
+            // РЎР±СЂРѕСЃРёС‚СЊ РїСЂРµРґС‹РґСѓС‰РµРµ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ
             _previewRtb.SuspendLayout();
             _previewRtb.Select(0, _previewRtb.TextLength);
             _previewRtb.SelectionColor = WinColor.Black;
             _previewRtb.Select(0, 0);
             _previewRtb.ResumeLayout();
 
-            // Выбор подсветки по радиокнопкам + расширению файла
+            // Р’С‹Р±РѕСЂ РїРѕРґСЃРІРµС‚РєРё РїРѕ СЂР°РґРёРѕРєРЅРѕРїРєР°Рј + СЂР°СЃС€РёСЂРµРЅРёСЋ С„Р°Р№Р»Р°
             if (rbCSharp.Checked)
             {
                 _syntaxHighlighter.HighlightCSharp(_previewRtb);
@@ -517,7 +518,7 @@ namespace StudentWorlsAssignment
             {
                 _syntaxHighlighter.HighlightPython(_previewRtb);
             }
-            // для остальных комбинаций (например, .txt) подсветка не применяется
+            // РґР»СЏ РѕСЃС‚Р°Р»СЊРЅС‹С… РєРѕРјР±РёРЅР°С†РёР№ (РЅР°РїСЂРёРјРµСЂ, .txt) РїРѕРґСЃРІРµС‚РєР° РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ
         }
 
         private void ClearPreview()
@@ -531,17 +532,34 @@ namespace StudentWorlsAssignment
                 }
                 ctrl.Dispose();
             }
-            // очищаем панель предпросмотра
+            // РѕС‡РёС‰Р°РµРј РїР°РЅРµР»СЊ РїСЂРµРґРїСЂРѕСЃРјРѕС‚СЂР°
             panelPreview.Controls.Clear();
             _previewRtb = null;
         }
 
-        // Прочие вспомогательные методы
+        // РџСЂРѕС‡РёРµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РјРµС‚РѕРґС‹
+        private static string ReadTextWithUTF8orANSI(string filePath)
+        {
+            // РїС‹С‚Р°РµРјСЃСЏ РїСЂРѕС‡РёС‚Р°С‚СЊ РІ UTF-8
+            byte[] bytes = File.ReadAllBytes(filePath);
+
+            var utf8Strict = new UTF8Encoding(false, true); // Р±РµР· BOM, СЃ РѕС€РёР±РєРѕР№ РїСЂРё РЅРµРІР°Р»РёРґРЅС‹С… Р±Р°Р№С‚Р°С…
+
+            try
+            {
+                return utf8Strict.GetString(bytes); // СЃСЂР°Р±РѕС‚Р°РµС‚ Рё РґР»СЏ UTFвЂ‘8 СЃ BOM, Рё Р±РµР· BOM
+            }
+            catch (DecoderFallbackException)
+            {
+                return Encoding.GetEncoding(1251).GetString(bytes); // ANSI (WindowsвЂ‘1251)
+            }
+        }
+
         private void OpenFileInAssociatedApp(string path)
         {
             if (!File.Exists(path))
             {
-                MessageBox.Show("Файл не найден: " + path);
+                MessageBox.Show("Р¤Р°Р№Р» РЅРµ РЅР°Р№РґРµРЅ: " + path);
                 return;
             }
 
@@ -555,7 +573,7 @@ namespace StudentWorlsAssignment
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Не удалось открыть файл:\n" + ex.Message);
+                MessageBox.Show("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»:\n" + ex.Message);
             }
         }
 
@@ -563,7 +581,7 @@ namespace StudentWorlsAssignment
         {
             var oldColor = ctrl.BackColor;
             ctrl.BackColor = WinColor.LightPink;
-            SystemSounds.Beep.Play(); // короткий системный звук.[web:283][web:289]
+            SystemSounds.Beep.Play(); // РєРѕСЂРѕС‚РєРёР№ СЃРёСЃС‚РµРјРЅС‹Р№ Р·РІСѓРє.[web:283][web:289]
             await Task.Delay(150);
             ctrl.BackColor = oldColor;
         }
@@ -571,7 +589,7 @@ namespace StudentWorlsAssignment
         private void rbHighlightMode_CheckedChanged(object? sender, EventArgs e)
         {
             if (sender is not RadioButton rb || !rb.Checked || _previewRtb is null)
-                return;  // реагируем только когда кнопка стала выбранной
+                return;  // СЂРµР°РіРёСЂСѓРµРј С‚РѕР»СЊРєРѕ РєРѕРіРґР° РєРЅРѕРїРєР° СЃС‚Р°Р»Р° РІС‹Р±СЂР°РЅРЅРѕР№
 
             ApplyHighlightingForCurrentFile(_lastPreviewExt);
         }
