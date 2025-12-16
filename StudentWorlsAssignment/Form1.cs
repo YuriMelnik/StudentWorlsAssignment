@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using StudentWorlsAssignment.Models;
 using StudentWorlsAssignment.Services;
+using StudentWorlsAssignment.Services.TextRendering;
 using System.Diagnostics;
 using System.Media;
 using System.Text;
@@ -18,38 +19,41 @@ namespace StudentWorlsAssignment
     {
 
         private static readonly string[] CSharpKeywords =
-        {
-"abstract","as","base","bool","break","byte","case","catch","char","checked",
-"class","const","continue","decimal","default","delegate","do","double","else",
-"enum","event","explicit","extern","false","finally","fixed","float","for",
-"foreach","goto","if","implicit","in","int","interface","internal","is","lock",
-"long","namespace","new","null","object","operator","out","override","params",
-"private","protected","public","readonly","ref","return","sbyte","sealed",
-"short","sizeof","stackalloc","static","string","struct","switch","this",
-"throw","true","try","typeof","uint","ulong","unchecked","unsafe","ushort",
-"using","virtual","void","volatile","while","var"
-};
+        [
+            "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const",
+            "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern",
+            "false", "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "int", "interface",
+            "internal", "is", "lock", "long", "namespace", "new", "null", "object", "operator", "out", "override",
+            "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short",
+            "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true", "try", "typeof",
+            "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile", "while", "var"
+        ];
 
         private static readonly string[] PythonKeywords =
-        {
-"False", "None", "True", "and", "as", "assert", "async", "await",
-"break", "class", "continue", "def", "del", "elif", "else", "except",
-"finally", "for", "from", "global", "if", "import", "in", "is",
-"lambda", "nonlocal", "not", "or", "pass", "raise", "return",
-"try", "while", "with", "yield"
-};
+        [
+            "False", "None", "True", "and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del",
+            "elif", "else", "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda",
+            "nonlocal", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"
+        ];
 
-        private static readonly string[] АllowedExtentions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif",
-".pdf", ".doc", ".docx", ".txt", ".rtf",
-".cs", ".xcf", ".py" };
+        private static readonly string[] АllowedExtentions =
+        [
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".pdf", ".doc", ".docx", ".txt", ".rtf", ".cs", ".sln", ".xcf",
+            ".py"
+        ];
+
+        private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png", ".bmp", ".gif"];
 
         private readonly ArchiveExtractor _archiveExtractor = new();
-        private readonly SyntaxHighlighter _syntaxHighlighter;
+        private readonly SyntaxHighlighter _syntaxHighlighter = 
+            new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
         private readonly DocxTextExtractor _docxTextExtractor = new();
         private readonly AiCodeReviewService _aiCodeReviewService;
 
         private string _baseOutputDir = string.Empty;
         private StudentFileService? _studentFileService;
+        private RichTextBox? _previewRtb;
+        private string _lastPreviewExt;
 
         public Form1()
         {
@@ -58,7 +62,7 @@ namespace StudentWorlsAssignment
             var httpClient = new HttpClient();
             _aiCodeReviewService = new AiCodeReviewService(httpClient);
 
-            _syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
+            //_syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
 
             SubscribeToEvents();
@@ -66,7 +70,7 @@ namespace StudentWorlsAssignment
 
         private void SubscribeToEvents()
         {
-            checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
+            //checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
             dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
             listBoxFiles.SelectedIndexChanged += ListBoxFiles_SelectedIndexChanged;
             listBoxFiles.DoubleClick += ListBoxFiles_DoubleClick;
@@ -429,71 +433,93 @@ namespace StudentWorlsAssignment
             ClearPreview();
 
             string ext = Path.GetExtension(filePath).ToLowerInvariant();
+            _lastPreviewExt = ext;
 
-            if (new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif" }.Contains(ext))
+            if (IsImageExt(ext))
             {
-                var pb = new PictureBox
-                {
-                    Dock = DockStyle.Fill,
-                    SizeMode = PictureBoxSizeMode.Zoom,
-                    BackgroundImage = Properties.Resources.chess800,
-                    Image = Image.FromFile(filePath)
-                };
-                panelPreview.Controls.Add(pb); // вывод изображения в панели.[web:1][web:2]
+                ShowImagePreview(filePath);
             }
 
-            else if (ext == ".docx") // || ext == )
-            {
-                var rtb = new RichTextBox
-                {
-                    Dock = DockStyle.Fill,
-                    ReadOnly = true,
-                    Font = new WinFont("Consolas", 10),
-                    WordWrap = false
-                };
-
-                string plainText = _docxTextExtractor.ExtractPlainTextFromDocx(filePath); // свой метод извлечения текста
-                rtb.Text = plainText;
-                if (checkBoxSyntax.Checked)
-                {
-                    // подсвечиваем как C#
-                    _syntaxHighlighter.HighlightCSharp(rtb); // тот же метод, что и для .cs
-                }
-                panelPreview.Controls.Add(rtb);
-            }
-
-            else if (new[] { ".txt", ".rtf", ".doc", ".pdf", ".cs", ".py" }.Contains(ext))
-            {
-                var rtb = new RichTextBox
-                {
-                    Dock = DockStyle.Fill,
-                    ReadOnly = true,
-                    Font = new WinFont("Consolas", 10),
-                    WordWrap = false
-                };
-
-                if (ext == ".rtf")
-                    rtb.LoadFile(filePath, RichTextBoxStreamType.RichText);
-                else if (ext == ".doc" || ext == ".pdf")
-                    rtb.Text = "\t\tПросмотр невозможен. \nОткройте двойным кликом этот файл во нешнем приложении";
-                else
-                {
-                    rtb.Text = File.ReadAllText(filePath); // показ содержимого текстового/CS файла.[web:16]
-                    if (checkBoxSyntax.Checked)
-                    {
-                        if (ext == ".py")
-                        {
-                            _syntaxHighlighter.HighlightPython(rtb); // подсветка синтаксиса для Python.[web:425][web:430]
-                        }
-                        else if (ext == ".cs")
-                        {
-                            _syntaxHighlighter.HighlightCSharp(rtb); // новая подсветка для C#.[web:423]
-                        }
-                    }
-                }
-                panelPreview.Controls.Add(rtb);
-            }
+            else ShowDocumentPreview(filePath, ext);
         }
+
+        private static bool IsImageExt(string ext) => ImageExtensions.Contains(ext);
+
+        private void ShowImagePreview(string filePath)
+        {
+            var pb = new PictureBox
+            {
+                Dock = DockStyle.Fill,
+                SizeMode = PictureBoxSizeMode.Zoom,
+                BackgroundImage = Properties.Resources.chess800,
+                Image = Image.FromFile(filePath)
+            };
+            panelPreview.Controls.Add(pb); // вывод изображения в панели.[web:1][web:2]
+            _previewRtb = null; // сейчас нет текстового предпросмотра
+        }
+
+        private void ShowDocumentPreview(string filePath, string ext)
+        {
+            var rtb = new RichTextBox
+            {
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                Font = new WinFont("Consolas", 10),
+                WordWrap = false
+            };
+
+            if (ext == ".docx")
+            {
+                string plainText = _docxTextExtractor.ExtractPlainTextFromDocx(filePath);
+                rtb.Text = plainText;
+            }
+            else if (ext == ".rtf")
+            {
+                rtb.LoadFile(filePath, RichTextBoxStreamType.RichText);
+            }
+            else if (ext == ".doc" || ext == ".pdf")
+            {
+                rtb.Text = "\t\tПросмотр невозможен. \nОткройте двойным кликом этот файл во нешнем приложении";
+            }
+            else
+            {
+                rtb.Text = File.ReadAllText(filePath); // показ содержимого текстового/CS файла.[web:16]
+            }
+            panelPreview.Controls.Add(rtb);
+            _previewRtb = rtb;
+
+            ApplyHighlightingForCurrentFile(ext);
+        }
+
+        private void ApplyHighlightingForCurrentFile(string ext)
+        {
+            // Нечего подсвечивать
+            if (_previewRtb is null)
+                return;
+
+            // Режим "без подсветки"
+            if (rbNoHighlight.Checked)
+                return;
+
+            // Сбросить предыдущее форматирование
+            _previewRtb.SuspendLayout();
+            _previewRtb.Select(0, _previewRtb.TextLength);
+            _previewRtb.SelectionColor = WinColor.Black;
+            _previewRtb.Select(0, 0);
+            _previewRtb.ResumeLayout();
+
+            // Выбор подсветки по радиокнопкам + расширению файла
+            if (rbCSharp.Checked)
+            {
+                _syntaxHighlighter.HighlightCSharp(_previewRtb);
+            }
+            else if (rbPython.Checked)
+            {
+                _syntaxHighlighter.HighlightPython(_previewRtb);
+            }
+            // для остальных комбинаций (например, .txt) подсветка не применяется
+        }
+
         private void ClearPreview()
         {
             foreach (System.Windows.Forms.Control ctrl in panelPreview.Controls)
@@ -505,8 +531,9 @@ namespace StudentWorlsAssignment
                 }
                 ctrl.Dispose();
             }
-
+            // очищаем панель предпросмотра
             panelPreview.Controls.Clear();
+            _previewRtb = null;
         }
 
         // Прочие вспомогательные методы
@@ -541,7 +568,13 @@ namespace StudentWorlsAssignment
             ctrl.BackColor = oldColor;
         }
 
+        private void rbHighlightMode_CheckedChanged(object? sender, EventArgs e)
+        {
+            if (sender is not RadioButton rb || !rb.Checked || _previewRtb is null)
+                return;  // реагируем только когда кнопка стала выбранной
 
+            ApplyHighlightingForCurrentFile(_lastPreviewExt);
+        }
     }
 
 }

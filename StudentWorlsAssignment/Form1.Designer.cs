@@ -28,47 +28,49 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Button button1;
+            Button buttonLosdArchive;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             panelPreview = new Panel();
             dataGridViewStudentvsMark = new DataGridView();
             Student = new DataGridViewTextBoxColumn();
             Mark = new DataGridViewTextBoxColumn();
-            textBox2 = new TextBox();
+            textBox_NeuroTask = new TextBox();
             listBoxFiles = new ListBox();
             label1 = new Label();
-            label2 = new Label();
-            checkBoxSyntax = new CheckBox();
             labelArchivFileName = new Label();
             buttonAiReview = new Button();
             buttonProperties = new Button();
-            button1 = new Button();
+            rbNoHighlight = new RadioButton();
+            groupBoxHighLighting = new GroupBox();
+            rbPython = new RadioButton();
+            rbCSharp = new RadioButton();
+            buttonLosdArchive = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).BeginInit();
+            groupBoxHighLighting.SuspendLayout();
             SuspendLayout();
             // 
-            // button1
+            // buttonLosdArchive
             // 
-            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.BackColor = SystemColors.ButtonHighlight;
-            button1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            button1.Location = new Point(1551, 297);
-            button1.Margin = new Padding(6);
-            button1.Name = "button1";
-            button1.RightToLeft = RightToLeft.Yes;
-            button1.Size = new Size(188, 119);
-            button1.TabIndex = 1;
-            button1.Text = "Загрузить архив \r\n    с работами";
-            button1.UseVisualStyleBackColor = false;
-            button1.Click += buttonLoadZip_Click;
+            buttonLosdArchive.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonLosdArchive.BackColor = SystemColors.ButtonHighlight;
+            buttonLosdArchive.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            buttonLosdArchive.Location = new Point(833, 117);
+            buttonLosdArchive.Name = "buttonLosdArchive";
+            buttonLosdArchive.RightToLeft = RightToLeft.Yes;
+            buttonLosdArchive.Size = new Size(101, 56);
+            buttonLosdArchive.TabIndex = 1;
+            buttonLosdArchive.Text = "Загрузить архив \r\n    с работами";
+            buttonLosdArchive.UseVisualStyleBackColor = false;
+            buttonLosdArchive.Click += buttonLoadZip_Click;
             // 
             // panelPreview
             // 
             panelPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            panelPreview.BackColor = SystemColors.ControlLightLight;
             panelPreview.BackgroundImageLayout = ImageLayout.Stretch;
-            panelPreview.Location = new Point(22, 26);
-            panelPreview.Margin = new Padding(6);
+            panelPreview.Location = new Point(12, 12);
             panelPreview.Name = "panelPreview";
-            panelPreview.Size = new Size(982, 954);
+            panelPreview.Size = new Size(545, 402);
             panelPreview.TabIndex = 0;
             // 
             // dataGridViewStudentvsMark
@@ -78,13 +80,12 @@
             dataGridViewStudentvsMark.BackgroundColor = SystemColors.ControlLightLight;
             dataGridViewStudentvsMark.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewStudentvsMark.Columns.AddRange(new DataGridViewColumn[] { Student, Mark });
-            dataGridViewStudentvsMark.Location = new Point(1016, 429);
-            dataGridViewStudentvsMark.Margin = new Padding(6);
+            dataGridViewStudentvsMark.Location = new Point(566, 201);
             dataGridViewStudentvsMark.MultiSelect = false;
             dataGridViewStudentvsMark.Name = "dataGridViewStudentvsMark";
-            dataGridViewStudentvsMark.RowHeadersWidth = 82;
+            dataGridViewStudentvsMark.RowHeadersWidth = 40;
             dataGridViewStudentvsMark.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dataGridViewStudentvsMark.Size = new Size(719, 693);
+            dataGridViewStudentvsMark.Size = new Size(368, 284);
             dataGridViewStudentvsMark.TabIndex = 2;
             dataGridViewStudentvsMark.CellClick += DataGridViewStudentvsMark_CellContentClick;
             // 
@@ -103,26 +104,24 @@
             Mark.Name = "Mark";
             Mark.Width = 200;
             // 
-            // textBox2
+            // textBox_NeuroTask
             // 
-            textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox2.ForeColor = SystemColors.ActiveCaption;
-            textBox2.Location = new Point(1016, 26);
-            textBox2.Margin = new Padding(6);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(669, 50);
-            textBox2.TabIndex = 4;
-            textBox2.Text = "Задание для нейропомощника";
+            textBox_NeuroTask.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            textBox_NeuroTask.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBox_NeuroTask.ForeColor = SystemColors.ActiveCaption;
+            textBox_NeuroTask.Location = new Point(566, 12);
+            textBox_NeuroTask.Name = "textBox_NeuroTask";
+            textBox_NeuroTask.Size = new Size(343, 29);
+            textBox_NeuroTask.TabIndex = 4;
+            textBox_NeuroTask.Text = "Задание для нейропомощника";
             // 
             // listBoxFiles
             // 
             listBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBoxFiles.FormattingEnabled = true;
-            listBoxFiles.Location = new Point(22, 992);
-            listBoxFiles.Margin = new Padding(6);
+            listBoxFiles.Location = new Point(12, 421);
             listBoxFiles.Name = "listBoxFiles";
-            listBoxFiles.Size = new Size(973, 132);
+            listBoxFiles.Size = new Size(545, 64);
             listBoxFiles.TabIndex = 5;
             // 
             // label1
@@ -130,50 +129,23 @@
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.ForeColor = SystemColors.ButtonShadow;
-            label1.Location = new Point(1495, 0);
-            label1.Margin = new Padding(6, 0, 6, 0);
+            label1.Location = new Point(805, 0);
             label1.Name = "label1";
-            label1.Size = new Size(264, 32);
+            label1.Size = new Size(131, 15);
             label1.TabIndex = 7;
             label1.Text = "(С) Мельник Ю.В. 2025";
-            // 
-            // label2
-            // 
-            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            label2.Location = new Point(1010, 297);
-            label2.Margin = new Padding(6, 0, 6, 0);
-            label2.Name = "label2";
-            label2.Size = new Size(488, 75);
-            label2.TabIndex = 8;
-            label2.Text = "В СДО ИДО на странице задания выберите \"Сохранить все ответы\". Загрузите этот архив .";
-            // 
-            // checkBoxSyntax
-            // 
-            checkBoxSyntax.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            checkBoxSyntax.AutoSize = true;
-            checkBoxSyntax.Checked = true;
-            checkBoxSyntax.CheckState = CheckState.Checked;
-            checkBoxSyntax.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            checkBoxSyntax.Location = new Point(1024, 378);
-            checkBoxSyntax.Margin = new Padding(6);
-            checkBoxSyntax.Name = "checkBoxSyntax";
-            checkBoxSyntax.Size = new Size(406, 36);
-            checkBoxSyntax.TabIndex = 0;
-            checkBoxSyntax.Text = "подсветить синтаксис *.cs *.py\r\n";
-            checkBoxSyntax.UseVisualStyleBackColor = true;
             // 
             // labelArchivFileName
             // 
             labelArchivFileName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelArchivFileName.AutoSize = true;
-            labelArchivFileName.ForeColor = SystemColors.HotTrack;
-            labelArchivFileName.Location = new Point(1010, 222);
-            labelArchivFileName.Margin = new Padding(6, 0, 6, 0);
-            labelArchivFileName.MaximumSize = new Size(719, 0);
+            labelArchivFileName.ForeColor = SystemColors.ControlDarkDark;
+            labelArchivFileName.Location = new Point(566, 117);
+            labelArchivFileName.MaximumSize = new Size(260, 60);
             labelArchivFileName.Name = "labelArchivFileName";
-            labelArchivFileName.Size = new Size(565, 32);
+            labelArchivFileName.Size = new Size(260, 60);
             labelArchivFileName.TabIndex = 9;
-            labelArchivFileName.Text = "полное имя архива - загрузите архив с ответами!";
+            labelArchivFileName.Text = "имя архива - загрузите архив с ответами!\r\nВ СДО ИДО на странице задания выберите \"Сохранить все ответы\". Загрузите этот архив .\r\n";
             // 
             // buttonAiReview
             // 
@@ -181,10 +153,9 @@
             buttonAiReview.BackColor = SystemColors.GradientInactiveCaption;
             buttonAiReview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             buttonAiReview.ForeColor = SystemColors.HotTrack;
-            buttonAiReview.Location = new Point(1551, 209);
-            buttonAiReview.Margin = new Padding(6);
+            buttonAiReview.Location = new Point(833, 76);
             buttonAiReview.Name = "buttonAiReview";
-            buttonAiReview.Size = new Size(184, 75);
+            buttonAiReview.Size = new Size(99, 35);
             buttonAiReview.TabIndex = 10;
             buttonAiReview.Text = "AI-проверка";
             buttonAiReview.UseVisualStyleBackColor = false;
@@ -196,34 +167,82 @@
             buttonProperties.BackgroundImage = Properties.Resources.settings100;
             buttonProperties.BackgroundImageLayout = ImageLayout.Stretch;
             buttonProperties.Image = Properties.Resources.settings;
-            buttonProperties.Location = new Point(1692, 32);
-            buttonProperties.Margin = new Padding(6);
+            buttonProperties.Location = new Point(911, 15);
             buttonProperties.Name = "buttonProperties";
-            buttonProperties.Size = new Size(47, 47);
+            buttonProperties.Size = new Size(25, 22);
             buttonProperties.TabIndex = 11;
             buttonProperties.UseVisualStyleBackColor = false;
             // 
+            // rbNoHighlight
+            // 
+            rbNoHighlight.AutoSize = true;
+            rbNoHighlight.Checked = true;
+            rbNoHighlight.Location = new Point(147, -2);
+            rbNoHighlight.Name = "rbNoHighlight";
+            rbNoHighlight.Size = new Size(109, 19);
+            rbNoHighlight.TabIndex = 12;
+            rbNoHighlight.TabStop = true;
+            rbNoHighlight.Text = "без подсветки";
+            rbNoHighlight.UseVisualStyleBackColor = true;
+            rbNoHighlight.CheckedChanged += rbHighlightMode_CheckedChanged;
+            // 
+            // groupBoxHighLighting
+            // 
+            groupBoxHighLighting.Controls.Add(rbPython);
+            groupBoxHighLighting.Controls.Add(rbCSharp);
+            groupBoxHighLighting.Controls.Add(rbNoHighlight);
+            groupBoxHighLighting.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            groupBoxHighLighting.ForeColor = SystemColors.Highlight;
+            groupBoxHighLighting.Location = new Point(566, 176);
+            groupBoxHighLighting.Name = "groupBoxHighLighting";
+            groupBoxHighLighting.Size = new Size(370, 19);
+            groupBoxHighLighting.TabIndex = 13;
+            groupBoxHighLighting.TabStop = false;
+            groupBoxHighLighting.Text = "Подсветка синтаксиса";
+            // 
+            // rbPython
+            // 
+            rbPython.AutoSize = true;
+            rbPython.Location = new Point(298, -2);
+            rbPython.Name = "rbPython";
+            rbPython.Size = new Size(64, 19);
+            rbPython.TabIndex = 14;
+            rbPython.Text = "Python";
+            rbPython.UseVisualStyleBackColor = true;
+            rbPython.CheckedChanged += rbHighlightMode_CheckedChanged;
+            // 
+            // rbCSharp
+            // 
+            rbCSharp.AutoSize = true;
+            rbCSharp.Location = new Point(258, -2);
+            rbCSharp.Name = "rbCSharp";
+            rbCSharp.Size = new Size(39, 19);
+            rbCSharp.TabIndex = 13;
+            rbCSharp.Text = "C#";
+            rbCSharp.UseVisualStyleBackColor = true;
+            rbCSharp.CheckedChanged += rbHighlightMode_CheckedChanged;
+            // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1757, 1148);
+            ClientSize = new Size(946, 497);
+            Controls.Add(groupBoxHighLighting);
             Controls.Add(buttonProperties);
+            Controls.Add(listBoxFiles);
             Controls.Add(buttonAiReview);
             Controls.Add(labelArchivFileName);
-            Controls.Add(checkBoxSyntax);
-            Controls.Add(label2);
             Controls.Add(label1);
-            Controls.Add(listBoxFiles);
-            Controls.Add(textBox2);
+            Controls.Add(textBox_NeuroTask);
             Controls.Add(dataGridViewStudentvsMark);
-            Controls.Add(button1);
+            Controls.Add(buttonLosdArchive);
             Controls.Add(panelPreview);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(6);
             Name = "Form1";
             Text = "Помощник  проверки заданий";
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).EndInit();
+            groupBoxHighLighting.ResumeLayout(false);
+            groupBoxHighLighting.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -231,17 +250,19 @@
         #endregion
 
         private Panel panelPreview;
-        private Button button1;
+        private Button buttonLosdArchive;
         private DataGridView dataGridViewStudentvsMark;
-        private TextBox textBox2;
+        private TextBox textBox_NeuroTask;
         private DataGridViewTextBoxColumn Student;
         private DataGridViewTextBoxColumn Mark;
         private ListBox listBoxFiles;
         private Label label1;
-        private Label label2;
-        private CheckBox checkBoxSyntax;
         private Label labelArchivFileName;
         private Button buttonAiReview;
         private Button buttonProperties;
+        private RadioButton rbNoHighlight;
+        private GroupBox groupBoxHighLighting;
+        private RadioButton rbPython;
+        private RadioButton rbCSharp;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace StudentWorlsAssignment.Services
+namespace StudentWorlsAssignment.Services.TextRendering
 {
     public sealed class SyntaxHighlighter
     {
@@ -11,15 +11,22 @@ namespace StudentWorlsAssignment.Services
         private readonly Regex _pyComment = new(@"#.*$", RegexOptions.Multiline | RegexOptions.Compiled);
         private readonly Regex _pyString = new("\"[^\"]*\"|'[^']*'", RegexOptions.Compiled);
 
-        private readonly string[] _csharpKeywords;
-        private readonly string[] _pythonKeywords;
+        private readonly IReadOnlyCollection<string> _csharpKeywords;
+        private readonly IReadOnlyCollection<string> _pythonKeywords;
 
-        public SyntaxHighlighter(string[] csharpKeywords, string[] pythonKeywords)
+        public SyntaxHighlighter()
         {
-            _csharpKeywords = csharpKeywords;
-            _pythonKeywords = pythonKeywords;
         }
 
+        public SyntaxHighlighter(
+            IReadOnlyCollection<string> csharpKeywords,
+            IReadOnlyCollection<string> pythonKeywords)
+        {
+            _csharpKeywords = csharpKeywords ?? Array.Empty<string>();
+            _pythonKeywords = pythonKeywords ?? Array.Empty<string>();
+        }
+
+        
         public void HighlightCSharp(RichTextBox rtb)
         {
             rtb.SuspendLayout();
@@ -100,5 +107,6 @@ namespace StudentWorlsAssignment.Services
             rtb.ResumeLayout();
         }
     }
+
 
 }
