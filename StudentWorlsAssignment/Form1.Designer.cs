@@ -186,6 +186,7 @@
             // 
             // groupBoxHighLighting
             // 
+            groupBoxHighLighting.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             groupBoxHighLighting.BackColor = SystemColors.ActiveCaption;
             groupBoxHighLighting.Controls.Add(rbPython);
             groupBoxHighLighting.Controls.Add(rbCSharp);
