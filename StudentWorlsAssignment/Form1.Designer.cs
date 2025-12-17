@@ -54,8 +54,7 @@
             buttonLosdArchive.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             buttonLosdArchive.BackColor = SystemColors.ButtonHighlight;
             buttonLosdArchive.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            buttonLosdArchive.Location = new Point(1306, 250);
-            buttonLosdArchive.Margin = new Padding(6);
+            buttonLosdArchive.Location = new Point(870, 117);
             buttonLosdArchive.Name = "buttonLosdArchive";
             buttonLosdArchive.RightToLeft = RightToLeft.Yes;
             buttonLosdArchive.Size = new Size(188, 119);
@@ -230,6 +229,7 @@
             // 
             // checkedListBoxFiles
             // 
+            checkedListBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             checkedListBoxFiles.FormattingEnabled = true;
             checkedListBoxFiles.Location = new Point(22, 834);
             checkedListBoxFiles.Margin = new Padding(6);
