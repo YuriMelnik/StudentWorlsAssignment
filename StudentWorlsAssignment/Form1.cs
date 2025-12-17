@@ -45,7 +45,7 @@ namespace StudentWorlsAssignment
         private static readonly string[] ImageExtensions = [".jpg", ".jpeg", ".png", ".bmp", ".gif"];
 
         private readonly ArchiveExtractor _archiveExtractor = new();
-        private readonly SyntaxHighlighter _syntaxHighlighter = 
+        private readonly SyntaxHighlighter _syntaxHighlighter =
             new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
         private readonly DocxTextExtractor _docxTextExtractor = new();
         private readonly AiCodeReviewService _aiCodeReviewService;
@@ -54,13 +54,14 @@ namespace StudentWorlsAssignment
         private StudentFileService? _studentFileService;
         private RichTextBox? _previewRtb;
         private string _lastPreviewExt;
+        private string _currentStudentName;
 
         public Form1()
         {
             InitializeComponent();
 
             var httpClient = new HttpClient();
-            _aiCodeReviewService = new AiCodeReviewService(httpClient);
+            _aiCodeReviewService = new AiCodeReviewService(httpClient/* при необходимости: настройки, HttpClient и т.п. */);
 
             //_syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
@@ -72,8 +73,8 @@ namespace StudentWorlsAssignment
         {
             //checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
             dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
-            listBoxFiles.SelectedIndexChanged += ListBoxFiles_SelectedIndexChanged;
-            listBoxFiles.DoubleClick += ListBoxFiles_DoubleClick;
+            checkedListBoxFiles.SelectedIndexChanged += checkedListBoxFiles_SelectedIndexChanged;
+            checkedListBoxFiles.DoubleClick += checkedListBoxFiles_DoubleClick;
         }
 
         // Публичные/protected переопределения
@@ -109,18 +110,18 @@ namespace StudentWorlsAssignment
                     else
                     {
                         // потом список файлов
-                        if (listBoxFiles.Items.Count > 0)
+                        if (checkedListBoxFiles.Items.Count > 0)
                         {
-                            listBoxFiles.Focus();
-                            if (listBoxFiles.SelectedIndex < 0)
-                                listBoxFiles.SelectedIndex = 0;
+                            checkedListBoxFiles.Focus();
+                            if (checkedListBoxFiles.SelectedIndex < 0)
+                                checkedListBoxFiles.SelectedIndex = 0;
                         }
                     }
                     return true;
                 case Keys.Enter:
                     // если фокус на списке файлов – открыть как по двойному клику
-                    if (//listBoxFiles.Focused &&
-                        listBoxFiles.SelectedItem is FileItem item &&
+                    if (//checkedListBoxFiles.Focused &&
+                        checkedListBoxFiles.SelectedItem is FileItem item &&
                         File.Exists(item.FullPath))
                     {
                         OpenFileInAssociatedApp(item.FullPath);
@@ -146,7 +147,7 @@ namespace StudentWorlsAssignment
 
             // очищаем список студентов и файлов
             dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
-            listBoxFiles.Items.Clear();
+            checkedListBoxFiles.Items.Clear();
             ClearPreview();
 
             string archivePath = openFileDialog.FileName;
@@ -178,7 +179,7 @@ namespace StudentWorlsAssignment
         private void CheckBoxSyntax_CheckedChanged(object? sender, EventArgs e)
         {
             // перерисовать текущий выбранный файл, если есть
-            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
+            if (checkedListBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
             {
                 ShowFileInPanel(item.FullPath);
             }
@@ -193,51 +194,38 @@ namespace StudentWorlsAssignment
 
             LoadFilesForCurrentStudent();
         }
-        private void ListBoxFiles_DoubleClick(object? sender, EventArgs e)
+        private void checkedListBoxFiles_DoubleClick(object? sender, EventArgs e)
         {
-            if (listBoxFiles.SelectedItem is not FileItem item)
+            if (checkedListBoxFiles.SelectedItem is not FileItem item)
                 return;
 
             OpenFileInAssociatedApp(item.FullPath);
 
         }
-        private void ListBoxFiles_SelectedIndexChanged(object? sender, EventArgs e)
+        private void checkedListBoxFiles_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            if (listBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
+            if (checkedListBoxFiles.SelectedItem is FileItem item && File.Exists(item.FullPath))
             {
                 ShowFileInPanel(item.FullPath);
             }
         }
         private async void buttonAiReview_Click(object sender, EventArgs e)
         {
-            if (panelPreview.Controls.OfType<RichTextBox>().FirstOrDefault() is not RichTextBox rtb)
+            var filesToReview = checkedListBoxFiles.CheckedItems
+                .Cast<string>()
+                .ToList();
+
+            if (filesToReview.Count == 0)
             {
-                MessageBox.Show("Сначала выберите текстовый файл или DOCX с кодом.");
+                MessageBox.Show("Отметьте хотя бы один файл для AI‑проверки.");
                 return;
             }
 
-            string code = rtb.Text;
-            if (string.IsNullOrWhiteSpace(code))
-            {
-                MessageBox.Show("Текст для анализа пуст.");
-                return;
-            }
+            string studentName = _currentStudentName;
 
-            buttonAiReview.Enabled = false;
-
-            try
-            {
-                string feedback = await _aiCodeReviewService.ReviewAsync(code);
-                ShowAiFeedback(feedback);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ошибка при запросе к AI-помощнику:\n" + ex.Message);
-            }
-            finally
-            {
-                buttonAiReview.Enabled = true;
-            }
+            var request = new AiReviewRequest(studentName, filesToReview);
+            using var dlg = new AiReviewForm(request, _aiCodeReviewService);
+            dlg.Show(this);
         }
 
 
@@ -272,9 +260,9 @@ namespace StudentWorlsAssignment
                 // загружаем файлы и показываем первый
                 LoadFilesForCurrentStudent();
 
-                if (listBoxFiles.Items.Count > 0 &&
-                    listBoxFiles.SelectedIndex >= 0 &&
-                    listBoxFiles.SelectedItem is FileItem item &&
+                if (checkedListBoxFiles.Items.Count > 0 &&
+                    checkedListBoxFiles.SelectedIndex >= 0 &&
+                    checkedListBoxFiles.SelectedItem is FileItem item &&
                     File.Exists(item.FullPath))
                 {
                     ShowFileInPanel(item.FullPath);
@@ -291,6 +279,8 @@ namespace StudentWorlsAssignment
                 return;
 
             string studentName = cellValue?.ToString() ?? string.Empty;
+            _currentStudentName = studentName;
+
             if (string.IsNullOrWhiteSpace(studentName))
                 return;
 
@@ -298,7 +288,7 @@ namespace StudentWorlsAssignment
         }
         private void LoadStudentFilesToListBox(string studentName)
         {
-            listBoxFiles.Items.Clear();
+            checkedListBoxFiles.Items.Clear();
             ClearPreview();
 
             if (_studentFileService == null)
@@ -320,11 +310,11 @@ namespace StudentWorlsAssignment
             }
             foreach (var file in files)
             {
-                listBoxFiles.Items.Add(file);
+                checkedListBoxFiles.Items.Add(file);
             }
 
-            if (listBoxFiles.Items.Count > 0)
-                listBoxFiles.SelectedIndex = 0;
+            if (checkedListBoxFiles.Items.Count > 0)
+                checkedListBoxFiles.SelectedIndex = 0;
 
         }
 
@@ -354,17 +344,17 @@ namespace StudentWorlsAssignment
         // Навигация по студентам/файлам
         private async void MoveToPrevFileOrStudent()
         {
-            // часть с listBoxFiles оставляем как есть
-            if (listBoxFiles.Items.Count > 0 &&
-                listBoxFiles.SelectedIndex > 0)
+            // часть с checkedListBoxFiles оставляем как есть
+            if (checkedListBoxFiles.Items.Count > 0 &&
+                checkedListBoxFiles.SelectedIndex > 0)
             {
-                listBoxFiles.SelectedIndex -= 1;
+                checkedListBoxFiles.SelectedIndex -= 1;
                 return;
             }
 
             if (dataGridViewStudentvsMark.CurrentRow == null)
             {
-                await BlinkControlAsync(listBoxFiles);
+                await BlinkControlAsync(checkedListBoxFiles);
                 return;
             }
 
@@ -386,23 +376,23 @@ namespace StudentWorlsAssignment
 
             LoadFilesForCurrentStudent();
 
-            if (listBoxFiles.Items.Count > 0)
-                listBoxFiles.SelectedIndex = listBoxFiles.Items.Count - 1;
+            if (checkedListBoxFiles.Items.Count > 0)
+                checkedListBoxFiles.SelectedIndex = checkedListBoxFiles.Items.Count - 1;
         }
         private async void MoveToNextFileOrStudent()
         {
             // 1) сначала листаем файлы
-            if (listBoxFiles.Items.Count > 0 &&
-                listBoxFiles.SelectedIndex >= 0 &&
-                listBoxFiles.SelectedIndex < listBoxFiles.Items.Count - 1)
+            if (checkedListBoxFiles.Items.Count > 0 &&
+                checkedListBoxFiles.SelectedIndex >= 0 &&
+                checkedListBoxFiles.SelectedIndex < checkedListBoxFiles.Items.Count - 1)
             {
-                listBoxFiles.SelectedIndex += 1;
+                checkedListBoxFiles.SelectedIndex += 1;
                 return;
             }
 
             if (dataGridViewStudentvsMark.CurrentRow == null)
             {
-                await BlinkControlAsync(listBoxFiles);
+                await BlinkControlAsync(checkedListBoxFiles);
                 return;
             }
 
@@ -423,8 +413,8 @@ namespace StudentWorlsAssignment
             dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
 
             LoadFilesForCurrentStudent();
-            if (listBoxFiles.Items.Count > 0)
-                listBoxFiles.SelectedIndex = 0;
+            if (checkedListBoxFiles.Items.Count > 0)
+                checkedListBoxFiles.SelectedIndex = 0;
         }
 
         // Предпросмотр файлов
