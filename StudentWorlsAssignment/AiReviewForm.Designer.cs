@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AiReviewForm));
             rtbAiReview = new RichTextBox();
             labelStudent = new Label();
             listBoxFiles = new ListBox();
@@ -66,6 +67,7 @@
             Controls.Add(listBoxFiles);
             Controls.Add(labelStudent);
             Controls.Add(rtbAiReview);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "AiReviewForm";
             Text = "AiReviewForm";
             ResumeLayout(false);

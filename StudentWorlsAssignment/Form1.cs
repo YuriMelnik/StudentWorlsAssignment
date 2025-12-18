@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using StudentWorlsAssignment.Models;
 using StudentWorlsAssignment.Services;
+using StudentWorlsAssignment.Ai;
 using StudentWorlsAssignment.Services.TextRendering;
 using System.Diagnostics;
 using System.Media;
@@ -212,7 +213,7 @@ namespace StudentWorlsAssignment
         private async void buttonAiReview_Click(object sender, EventArgs e)
         {
             var filesToReview = checkedListBoxFiles.CheckedItems
-                .Cast<string>()
+                .Cast<FileItem>()
                 .ToList();
 
             if (filesToReview.Count == 0)
@@ -225,7 +226,7 @@ namespace StudentWorlsAssignment
 
             var request = new AiReviewRequest(studentName, filesToReview);
             using var dlg = new AiReviewForm(request, _aiCodeReviewService);
-            dlg.Show(this);
+            dlg.ShowDialog(this);
         }
 
 

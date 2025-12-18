@@ -34,7 +34,7 @@ namespace StudentWorlsAssignment.Services
 
             var allFiles = Directory.GetFiles(studentFolder, "*", SearchOption.AllDirectories);
 
-            files = [.. allFiles.Where(f => _allowedExtentions.Contains(Path.GetExtension(f).ToLowerInvariant())).Select(f => new FileItem(f))];
+            files = [.. allFiles.Where(f => _allowedExtentions.Contains(Path.GetExtension(f).ToLowerInvariant())).Select(f => new FileItem(f, _allowedExtentions))];
 
             return files.Count > 0;
         }
