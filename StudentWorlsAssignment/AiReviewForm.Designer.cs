@@ -36,7 +36,9 @@
             // 
             // rtbAiReview
             // 
+            rtbAiReview.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             rtbAiReview.Location = new Point(3, 129);
+            rtbAiReview.MinimumSize = new Size(100, 0);
             rtbAiReview.Name = "rtbAiReview";
             rtbAiReview.Size = new Size(279, 298);
             rtbAiReview.TabIndex = 0;
@@ -53,8 +55,11 @@
             // 
             // listBoxAiFiles
             // 
+            listBoxAiFiles.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             listBoxAiFiles.FormattingEnabled = true;
+            listBoxAiFiles.HorizontalScrollbar = true;
             listBoxAiFiles.Location = new Point(3, 27);
+            listBoxAiFiles.MinimumSize = new Size(100, 0);
             listBoxAiFiles.Name = "listBoxAiFiles";
             listBoxAiFiles.Size = new Size(279, 49);
             listBoxAiFiles.TabIndex = 2;

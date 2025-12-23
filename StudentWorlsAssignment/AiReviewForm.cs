@@ -18,16 +18,22 @@ namespace StudentWorlsAssignment
             private readonly AiReviewRequest _request;
             private readonly AiCodeReviewService _aiService;
 
-            public AiReviewForm(AiReviewRequest request, AiCodeReviewService aiService)
+        public AiReviewForm(AiReviewRequest request, AiCodeReviewService aiService)
+        {
+            InitializeComponent();
+
+            _request = request;
+            _aiService = aiService;
+
+            labelStudent.Text = $"Студент: {_request.StudentName}";
+            //checkedListBoxFiles.DataSource = _request.FilePaths;
+
+            foreach (var filePath in _request.FilePaths)
             {
-                InitializeComponent();
-
-                _request = request;
-                _aiService = aiService;
-
-                labelStudent.Text = $"Студент: {_request.StudentName}";
-                //checkedListBoxFiles.DataSource = _request.FilePaths;
+                listBoxAiFiles.Items.Add(filePath); // по умолчанию все файлы выбраны
             }
+        
+        }
        
     }
 }

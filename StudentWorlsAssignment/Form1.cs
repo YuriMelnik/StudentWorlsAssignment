@@ -473,6 +473,7 @@ namespace StudentWorlsAssignment
                 Font = new WinFont("Consolas", 10),
                 WordWrap = false
             };
+            rtb.ScrollBars = RichTextBoxScrollBars.Both;
 
             if (ext == ".docx")
             {
