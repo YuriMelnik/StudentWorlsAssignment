@@ -28,11 +28,16 @@ namespace StudentWorlsAssignment
             labelStudent.Text = $"Студент: {_request.StudentName}";
             //checkedListBoxFiles.DataSource = _request.FilePaths;
 
+            // по умолчанию все файлы,которые выбраны 
+            // в списке файлов для ревью, отмечены в checkedListBox
+            // дубликатов не будет, т.к. форма модальная и для изменения 
+            // списка файлов нужно заново открыть форму
             foreach (var filePath in _request.FilePaths)
             {
-                listBoxAiFiles.Items.Add(filePath); // по умолчанию все файлы выбраны
+                listBoxAiFiles.Items.Add(filePath); 
             }
-        
+            // TODO: ДОБАВИТЬ КОД ИЗ ФАЙЛОВ в prompt
+
         }
        
     }
