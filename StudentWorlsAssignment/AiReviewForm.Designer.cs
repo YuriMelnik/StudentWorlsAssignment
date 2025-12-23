@@ -31,12 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AiReviewForm));
             rtbAiReview = new RichTextBox();
             labelStudent = new Label();
-            listBoxFiles = new ListBox();
+            listBoxAiFiles = new ListBox();
             SuspendLayout();
             // 
             // rtbAiReview
             // 
-            rtbAiReview.Location = new Point(0, 129);
+            rtbAiReview.Location = new Point(3, 129);
             rtbAiReview.Name = "rtbAiReview";
             rtbAiReview.Size = new Size(279, 298);
             rtbAiReview.TabIndex = 0;
@@ -51,20 +51,20 @@
             labelStudent.TabIndex = 1;
             labelStudent.Text = "ФИО студента";
             // 
-            // listBoxFiles
+            // listBoxAiFiles
             // 
-            listBoxFiles.FormattingEnabled = true;
-            listBoxFiles.Location = new Point(0, 29);
-            listBoxFiles.Name = "listBoxFiles";
-            listBoxFiles.Size = new Size(279, 49);
-            listBoxFiles.TabIndex = 2;
+            listBoxAiFiles.FormattingEnabled = true;
+            listBoxAiFiles.Location = new Point(3, 27);
+            listBoxAiFiles.Name = "listBoxAiFiles";
+            listBoxAiFiles.Size = new Size(279, 49);
+            listBoxAiFiles.TabIndex = 2;
             // 
             // AiReviewForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(383, 450);
-            Controls.Add(listBoxFiles);
+            Controls.Add(listBoxAiFiles);
             Controls.Add(labelStudent);
             Controls.Add(rtbAiReview);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -78,6 +78,6 @@
 
         private RichTextBox rtbAiReview;
         private Label labelStudent;
-        private ListBox listBoxFiles;
+        private ListBox listBoxAiFiles;
     }
 }

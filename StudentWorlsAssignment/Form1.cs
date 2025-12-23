@@ -66,6 +66,8 @@ namespace StudentWorlsAssignment
 
             //_syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
+            dataGridViewStudentvsMark.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            dataGridViewStudentvsMark.Columns[0].ReadOnly = true; // колонка с именем студента
 
             SubscribeToEvents();
         }
@@ -129,9 +131,22 @@ namespace StudentWorlsAssignment
                         return true;
                     }
                     break;
+                case Keys.Space:
+                    // здесь ставим/снимаем чек у файла, а в грид событие не пускаем
+                    ToggleCurrentFileCheck(); // твоя логика чекбокса/флага
+                    return true;              // важное: блокируем стандартную обработку
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void ToggleCurrentFileCheck()
+        {
+            int index = checkedListBoxFiles.SelectedIndex;
+            if (index < 0 || index >= checkedListBoxFiles.Items.Count)
+                return;
+            bool isChecked = checkedListBoxFiles.GetItemChecked(index);
+            checkedListBoxFiles.SetItemChecked(index, !isChecked);
         }
 
         // Обработчики событий UI
