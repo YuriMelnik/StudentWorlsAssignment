@@ -34,7 +34,7 @@
             dataGridViewStudentvsMark = new DataGridView();
             Student = new DataGridViewTextBoxColumn();
             Mark = new DataGridViewTextBoxColumn();
-            textBox_NeuroTask = new TextBox();
+            textBoxAssignmentDescription = new TextBox();
             label1 = new Label();
             labelArchivFileName = new Label();
             buttonAiReview = new Button();
@@ -105,16 +105,17 @@
             Mark.Name = "Mark";
             Mark.Width = 200;
             // 
-            // textBox_NeuroTask
+            // textBoxAssignmentDescription
             // 
-            textBox_NeuroTask.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox_NeuroTask.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox_NeuroTask.ForeColor = SystemColors.ActiveCaption;
-            textBox_NeuroTask.Location = new Point(484, 12);
-            textBox_NeuroTask.Name = "textBox_NeuroTask";
-            textBox_NeuroTask.Size = new Size(343, 29);
-            textBox_NeuroTask.TabIndex = 4;
-            textBox_NeuroTask.Text = "Задание для нейропомощника";
+            textBoxAssignmentDescription.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            textBoxAssignmentDescription.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBoxAssignmentDescription.ForeColor = SystemColors.ActiveCaption;
+            textBoxAssignmentDescription.Location = new Point(484, 12);
+            textBoxAssignmentDescription.Multiline = true;
+            textBoxAssignmentDescription.Name = "textBoxAssignmentDescription";
+            textBoxAssignmentDescription.Size = new Size(343, 59);
+            textBoxAssignmentDescription.TabIndex = 4;
+            textBoxAssignmentDescription.Text = "Условие задачи\r\nЗадание для студентов";
             // 
             // label1
             // 
@@ -238,7 +239,7 @@
             Controls.Add(buttonAiReview);
             Controls.Add(labelArchivFileName);
             Controls.Add(label1);
-            Controls.Add(textBox_NeuroTask);
+            Controls.Add(textBoxAssignmentDescription);
             Controls.Add(dataGridViewStudentvsMark);
             Controls.Add(buttonLosdArchive);
             Controls.Add(panelPreview);
@@ -257,7 +258,7 @@
         private Panel panelPreview;
         private Button buttonLosdArchive;
         private DataGridView dataGridViewStudentvsMark;
-        private TextBox textBox_NeuroTask;
+        private TextBox textBoxAssignmentDescription;
         private DataGridViewTextBoxColumn Student;
         private DataGridViewTextBoxColumn Mark;
         private Label label1;

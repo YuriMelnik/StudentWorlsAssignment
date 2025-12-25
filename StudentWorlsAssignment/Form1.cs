@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
+﻿using Microsoft.Extensions.Configuration;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using StudentWorlsAssignment.Models;
 using StudentWorlsAssignment.Services;
@@ -18,6 +19,8 @@ namespace StudentWorlsAssignment
 {
     public partial class Form1 : Form
     {
+        private const int StudentNameColumnIndex = 0;
+        private const int MarkColumnIndex = 1;
 
         private static readonly string[] CSharpKeywords =
         [
@@ -37,7 +40,7 @@ namespace StudentWorlsAssignment
             "nonlocal", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"
         ];
 
-        private static readonly string[] АllowedExtentions =
+        private static readonly string[] AllowedExtentions =
         [
             ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".pdf", ".doc", ".docx", ".txt", ".rtf", ".cs", ".sln", ".xcf",
             ".py"
@@ -61,13 +64,44 @@ namespace StudentWorlsAssignment
         {
             InitializeComponent();
 
-            var httpClient = new HttpClient();
-            _aiCodeReviewService = new AiCodeReviewService(httpClient/* при необходимости: настройки, HttpClient и т.п. */);
+            // --- НАЧАЛО: НАСТРОЙКА AI СЕРВИСА ---
+            // 1. Создаем билдер конфигурации
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory()) // Ищем файл в папке с .exe
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            //_syntaxHighlighter = new SyntaxHighlighter(CSharpKeywords, PythonKeywords);
+            // 2. Собираем конфигурацию в объект
+            IConfigurationRoot configuration = configBuilder.Build();
+
+            // 3. Получаем нужную нам секцию "AiSettings"
+            var aiSettings = configuration.GetSection("AiSettings");
+
+            // ... ваш код для чтения из appsettings.json ...
+            var apiKey = aiSettings["ApiKey"];
+            var endpoint = aiSettings["Endpoint"];
+            var model = aiSettings["Model"]; // Убедитесь, что эта строка есть!
+
+            // 5. Проверяем, что все настройки на месте
+            if (string.IsNullOrEmpty(apiKey) 
+                || string.IsNullOrEmpty(endpoint) 
+                || string.IsNullOrEmpty(model)) 
+            {
+                MessageBox.Show(
+                    "AI-сервис не настроен. Проверьте файл appsettings.json",
+                    "Ошибка конфигурации", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+                buttonAiReview.Enabled = false;  // Отключаем кнопку, если настройки неверны
+            }
+
+            // 6. Создаем HttpClient и наш сервис
+            var httpClient = new HttpClient();
+            _aiCodeReviewService = new AiCodeReviewService(httpClient, apiKey, endpoint, model);
+            // --- КОНЕЦ: НАСТРОЙКА AI СЕРВИСА ---
+
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
             dataGridViewStudentvsMark.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-            dataGridViewStudentvsMark.Columns[0].ReadOnly = true; // колонка с именем студента
+            dataGridViewStudentvsMark.Columns[StudentNameColumnIndex].ReadOnly = true; // колонка с именем студента
 
             SubscribeToEvents();
         }
@@ -98,7 +132,7 @@ namespace StudentWorlsAssignment
                     {
                         dataGridViewStudentvsMark.Focus();
                         dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[0]; // имя студента
+                            dataGridViewStudentvsMark.CurrentRow.Cells[StudentNameColumnIndex]; // имя студента
                     }
                     return true;
 
@@ -108,7 +142,7 @@ namespace StudentWorlsAssignment
                         dataGridViewStudentvsMark.CurrentRow != null)
                     {
                         dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[1]; // оценка
+                            dataGridViewStudentvsMark.CurrentRow.Cells[MarkColumnIndex]; // оценка
                     }
                     else
                     {
@@ -187,7 +221,7 @@ namespace StudentWorlsAssignment
             }
 
             // создаем сервис
-            _studentFileService = new StudentFileService(_baseOutputDir, АllowedExtentions);
+            _studentFileService = new StudentFileService(_baseOutputDir, AllowedExtentions);
 
             // здесь — уже чисто UI: заполняем таблицу студентов по папкам
             FillStudentsFromFolders();
@@ -237,11 +271,27 @@ namespace StudentWorlsAssignment
                 return;
             }
 
+            // ВАЖНО: Вам нужно откуда-то взять текст задания.
+            // Например, из TextBox на форме.
+            string assignmentDescription = textBoxAssignmentDescription.Text;
+            if (string.IsNullOrWhiteSpace(assignmentDescription))
+            {
+                if (MessageBox.Show(
+                    "Введите условие задачи для оценки.", 
+                    "Будем вводить условие?", 
+                    MessageBoxButtons.YesNo) 
+                    == DialogResult.Yes)
+                return;
+            }
+
             string studentName = _currentStudentName;
 
-            var request = new AiReviewRequest(studentName, filesToReview);
-            using var dlg = new AiReviewForm(request, _aiCodeReviewService);
-            dlg.ShowDialog(this);
+            // Создаем запрос, включая описание задания
+            var request = new AiReviewRequest(studentName, filesToReview, assignmentDescription);
+
+            // Создаем и показываем форму ревью
+            using var dlg = new AiReviewForm(request, _aiCodeReviewService, _docxTextExtractor);
+            dlg.ShowDialog(this); // ShowDialog делает форму модальной
         }
 
 
@@ -259,7 +309,7 @@ namespace StudentWorlsAssignment
             {
                 string studentName = Path.GetFileName(folder);
                 int rowIndex = dataGridViewStudentvsMark.Rows.Add();
-                dataGridViewStudentvsMark.Rows[rowIndex].Cells[0].Value = studentName;
+                dataGridViewStudentvsMark.Rows[rowIndex].Cells[StudentNameColumnIndex].Value = studentName;
             }
             if (dataGridViewStudentvsMark.Rows.Count > 0)
             {
@@ -267,8 +317,8 @@ namespace StudentWorlsAssignment
                 dataGridViewStudentvsMark.ClearSelection();
                 var firstRow = dataGridViewStudentvsMark.Rows[0];
 
-                dataGridViewStudentvsMark.CurrentCell = firstRow.Cells[0];
-                firstRow.Cells[0].Selected = true;
+                dataGridViewStudentvsMark.CurrentCell = firstRow.Cells[StudentNameColumnIndex];
+                firstRow.Cells[StudentNameColumnIndex].Selected = true;
 
                 // ставим фокус в таблицу
                 dataGridViewStudentvsMark.Focus();
@@ -290,7 +340,7 @@ namespace StudentWorlsAssignment
             if (dataGridViewStudentvsMark.CurrentRow == null)
                 return;
 
-            var cellValue = dataGridViewStudentvsMark.CurrentRow.Cells[0].Value;
+            var cellValue = dataGridViewStudentvsMark.CurrentRow.Cells[StudentNameColumnIndex].Value;
             if (cellValue == null)
                 return;
 

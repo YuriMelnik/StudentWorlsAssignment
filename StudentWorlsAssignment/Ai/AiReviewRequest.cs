@@ -5,14 +5,17 @@ namespace StudentWorlsAssignment
     public sealed class AiReviewRequest
     {
         public string StudentName { get; }
-        public IReadOnlyList<string> FilePaths { get; }
+        public List<FileItem> FilesToReview { get; }
+        public string AssignmentDescription { get; } // Добавьте это свойство
 
-        public AiReviewRequest(string studentName, IReadOnlyList<FileItem> items)
+        public AiReviewRequest(
+            string studentName,
+            List<FileItem> filesToReview,
+            string assignmentDescription)
         {
             StudentName = studentName;
-            FilePaths = items
-                .Select(i => i.FullPath)
-                .ToList();    // List<string> неявно приводится к IReadOnlyList<string>
+            FilesToReview = filesToReview;
+            AssignmentDescription = assignmentDescription;
         }
     }
 
