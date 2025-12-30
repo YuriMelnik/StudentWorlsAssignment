@@ -73,6 +73,16 @@ namespace StudentWorlsAssignment.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap copy {
+            get {
+                object obj = ResourceManager.GetObject("copy", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap foni_papik_pro_bram_p_kartinki_kletochka_na_prozrachnom_fone_17 {
             get {
                 object obj = ResourceManager.GetObject("foni-papik-pro-bram-p-kartinki-kletochka-na-prozrachnom-fone-17", resourceCulture);

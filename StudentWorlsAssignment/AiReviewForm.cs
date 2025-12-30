@@ -21,7 +21,7 @@ namespace StudentWorlsAssignment
         private readonly DocxTextExtractor _docxTextExtractor;
 
         public AiReviewForm(
-            AiReviewRequest request, 
+            AiReviewRequest request,
             AiCodeReviewService aiService,
             DocxTextExtractor docxTextExtractor)
         {
@@ -131,7 +131,7 @@ namespace StudentWorlsAssignment
 
             // Для удобства шаблон можно хранить в отдельном файле в проекте
             // и читать его через File.ReadAllText(). Но для примера оставим его здесь.
-            string finalPrompt =  $@"
+            string finalPrompt = $@"
 Ты — опытный преподаватель программирования и эксперт-разработчик. Твоя задача — объективно и конструктивно оценить работу студента по предоставленному заданию.
 
 Ты должен оценить работу по 100-балльной шкале, основываясь на критериях ниже. В конце ответа предоставь итоговую оценку и подробное объяснение.
@@ -205,11 +205,17 @@ namespace StudentWorlsAssignment
 **Что сделано хорошо:**
 *   [Список положительных моментов работы.]
 
+**Недостатки и ошибки:**
+*   [Список конкретных проблем, ошибок или упущений в работе.]
+
+**Вероятность, что код сгенерирован AI:**
+*   [Оценка вероятности использования AI кода]
+
 **Что можно улучшить:**
 *   [Список конкретных, конструктивных предложений по улучшению кода и логики. Приведи примеры, если возможно.]
 ";
 
-             return finalPrompt;
+            return finalPrompt;
         }
 
         // Нам понадобится тот же метод чтения файлов, что и в Form1.
@@ -228,5 +234,9 @@ namespace StudentWorlsAssignment
             }
         }
 
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
