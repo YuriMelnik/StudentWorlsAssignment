@@ -86,11 +86,12 @@ namespace StudentWorksAssignment
                 || string.IsNullOrEmpty(endpoint)
                 || string.IsNullOrEmpty(model))
             {
-                MessageBox.Show(
-                    "AI-сервис не настроен. Проверьте файл appsettings.json",
-                    "Ошибка конфигурации",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                //MessageBox.Show(
+                //    "AI-сервис не настроен. Проверьте файл appsettings.json",
+                //    "Ошибка конфигурации",
+                //    MessageBoxButtons.OK,
+                //    MessageBoxIcon.Error);
+                buttonAiReview.Text = "AI-сервис\r\nне настроен";
                 buttonAiReview.Enabled = false;  // Отключаем кнопку, если настройки неверны
             }
 

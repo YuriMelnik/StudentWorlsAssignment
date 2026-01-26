@@ -69,7 +69,7 @@
             panelLeft.Location = new Point(0, 0);
             panelLeft.Name = "panelLeft";
             panelLeft.Padding = new Padding(5);
-            panelLeft.Size = new Size(684, 361);
+            panelLeft.Size = new Size(1070, 674);
             panelLeft.TabIndex = 0;
             // 
             // panelPreview
@@ -79,7 +79,7 @@
             panelPreview.Dock = DockStyle.Fill;
             panelPreview.Location = new Point(5, 5);
             panelPreview.Name = "panelPreview";
-            panelPreview.Size = new Size(674, 275);
+            panelPreview.Size = new Size(1060, 588);
             panelPreview.TabIndex = 0;
             // 
             // checkedListBoxFiles
@@ -87,19 +87,19 @@
             checkedListBoxFiles.Dock = DockStyle.Bottom;
             checkedListBoxFiles.FormattingEnabled = true;
             checkedListBoxFiles.HorizontalScrollbar = true;
-            checkedListBoxFiles.Location = new Point(5, 280);
+            checkedListBoxFiles.Location = new Point(5, 593);
             checkedListBoxFiles.Name = "checkedListBoxFiles";
-            checkedListBoxFiles.Size = new Size(674, 76);
+            checkedListBoxFiles.Size = new Size(1060, 76);
             checkedListBoxFiles.TabIndex = 1;
             // 
             // panelRight
             // 
             panelRight.Controls.Add(tableLayoutPanelMain);
             panelRight.Dock = DockStyle.Right;
-            panelRight.Location = new Point(276, 0);
+            panelRight.Location = new Point(662, 0);
             panelRight.Name = "panelRight";
             panelRight.Padding = new Padding(5);
-            panelRight.Size = new Size(408, 361);
+            panelRight.Size = new Size(408, 674);
             panelRight.TabIndex = 1;
             // 
             // tableLayoutPanelMain
@@ -116,7 +116,7 @@
             tableLayoutPanelMain.RowStyles.Add(new RowStyle());
             tableLayoutPanelMain.RowStyles.Add(new RowStyle());
             tableLayoutPanelMain.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanelMain.Size = new Size(398, 351);
+            tableLayoutPanelMain.Size = new Size(398, 664);
             tableLayoutPanelMain.TabIndex = 0;
             // 
             // panelTopRight
@@ -198,9 +198,7 @@
             // 
             panelControls.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             panelControls.Controls.Add(panelHighLightingSyntax);
-            panelControls.Controls.Add(buttonProperties);
             panelControls.Controls.Add(buttonAiReview);
-            panelControls.Enabled = false;
             panelControls.Location = new Point(283, 3);
             panelControls.Name = "panelControls";
             panelControls.Size = new Size(106, 168);
@@ -209,6 +207,7 @@
             // panelHighLightingSyntax
             // 
             panelHighLightingSyntax.Controls.Add(labelHighLightText);
+            panelHighLightingSyntax.Controls.Add(buttonProperties);
             panelHighLightingSyntax.Controls.Add(rbPython);
             panelHighLightingSyntax.Controls.Add(rbCSharp);
             panelHighLightingSyntax.Controls.Add(rbNoHighlight);
@@ -269,7 +268,7 @@
             buttonProperties.BackgroundImage = Properties.Resources.settings100;
             buttonProperties.BackgroundImageLayout = ImageLayout.Stretch;
             buttonProperties.ImageAlign = ContentAlignment.TopLeft;
-            buttonProperties.Location = new Point(81, 105);
+            buttonProperties.Location = new Point(79, 80);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(24, 24);
             buttonProperties.TabIndex = 11;
@@ -280,9 +279,9 @@
             buttonAiReview.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             buttonAiReview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             buttonAiReview.ForeColor = Color.DarkBlue;
-            buttonAiReview.Location = new Point(0, 129);
+            buttonAiReview.Location = new Point(0, 109);
             buttonAiReview.Name = "buttonAiReview";
-            buttonAiReview.Size = new Size(106, 36);
+            buttonAiReview.Size = new Size(106, 56);
             buttonAiReview.TabIndex = 10;
             buttonAiReview.Text = "AI-проверка";
             buttonAiReview.UseVisualStyleBackColor = true;
@@ -299,7 +298,7 @@
             dataGridViewStudentVsMark.MultiSelect = false;
             dataGridViewStudentVsMark.Name = "dataGridViewStudentVsMark";
             dataGridViewStudentVsMark.RowHeadersWidth = 40;
-            dataGridViewStudentVsMark.Size = new Size(392, 94);
+            dataGridViewStudentVsMark.Size = new Size(392, 407);
             dataGridViewStudentVsMark.TabIndex = 2;
             dataGridViewStudentVsMark.CellClick += DataGridViewStudentvsMark_CellContentClick;
             // 
@@ -322,7 +321,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(684, 361);
+            ClientSize = new Size(1070, 674);
             Controls.Add(panelRight);
             Controls.Add(panelLeft);
             Icon = (Icon)resources.GetObject("$this.Icon");
