@@ -3,7 +3,7 @@ using SharpCompress.Archives.Rar;
 using SharpCompress.Common;
 using System.IO.Compression;
 
-namespace StudentWorlsAssignment.Services
+namespace StudentWorksAssignment.Services
 {
     public sealed class ArchiveExtractor
     {

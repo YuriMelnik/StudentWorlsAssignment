@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace StudentWorlsAssignment.Services.TextRendering
+namespace StudentWorksAssignment.Services.TextRendering
 {
     public sealed class SyntaxHighlightRules
     {

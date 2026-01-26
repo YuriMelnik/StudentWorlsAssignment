@@ -1,11 +1,11 @@
-﻿using StudentWorlsAssignment.Models;
+﻿using StudentWorksAssignment.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StudentWorlsAssignment.Services
+namespace StudentWorksAssignment.Services
 {
     internal sealed class StudentFileService
     {

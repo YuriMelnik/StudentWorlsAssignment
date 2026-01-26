@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace StudentWorlsAssignment
+namespace StudentWorksAssignment
 {
     internal static class Program
     {

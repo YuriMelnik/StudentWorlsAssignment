@@ -1,6 +1,6 @@
-﻿using StudentWorlsAssignment.Models;
+﻿using StudentWorksAssignment.Models;
 
-namespace StudentWorlsAssignment
+namespace StudentWorksAssignment
 {
     public sealed class AiReviewRequest
     {

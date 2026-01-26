@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace StudentWorlsAssignment.Ai;
+namespace StudentWorksAssignment.Ai;
 
 public sealed class AiCodeReviewService
 {

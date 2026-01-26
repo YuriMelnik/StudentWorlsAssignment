@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace StudentWorlsAssignment.Services.TextRendering
+namespace StudentWorksAssignment.Services.TextRendering
 {
     public sealed class SyntaxHighlighter
     {

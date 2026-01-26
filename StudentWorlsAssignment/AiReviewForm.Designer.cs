@@ -1,4 +1,4 @@
-﻿namespace StudentWorlsAssignment
+﻿namespace StudentWorksAssignment
 {
     partial class AiReviewForm
     {
@@ -179,7 +179,6 @@
             buttonCopyPrompt.Size = new Size(22, 23);
             buttonCopyPrompt.TabIndex = 19;
             buttonCopyPrompt.UseVisualStyleBackColor = false;
-            buttonCopyPrompt.Click += this.buttonCopyPrompt_Click;
             // 
             // buttonCopyText
             // 

@@ -1,4 +1,4 @@
-namespace StudentWorlsAssignment.Models
+namespace StudentWorksAssignment.Models
 {
     public class FileItem
     {

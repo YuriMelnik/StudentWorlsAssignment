@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using StudentWorlsAssignment.Models;
-using StudentWorlsAssignment.Services;
-using StudentWorlsAssignment.Ai;
-using StudentWorlsAssignment.Services.TextRendering;
+using StudentWorksAssignment.Models;
+using StudentWorksAssignment.Services;
+using StudentWorksAssignment.Ai;
+using StudentWorksAssignment.Services.TextRendering;
 using System.Diagnostics;
 using System.Media;
 using System.Text;
@@ -15,7 +15,7 @@ using WinFont = System.Drawing.Font;
 
 
 
-namespace StudentWorlsAssignment
+namespace StudentWorksAssignment
 {
     public partial class Form1 : Form
     {
@@ -82,14 +82,14 @@ namespace StudentWorlsAssignment
             var model = aiSettings["Model"]; // Убедитесь, что эта строка есть!
 
             // 5. Проверяем, что все настройки на месте
-            if (string.IsNullOrEmpty(apiKey) 
-                || string.IsNullOrEmpty(endpoint) 
-                || string.IsNullOrEmpty(model)) 
+            if (string.IsNullOrEmpty(apiKey)
+                || string.IsNullOrEmpty(endpoint)
+                || string.IsNullOrEmpty(model))
             {
                 MessageBox.Show(
                     "AI-сервис не настроен. Проверьте файл appsettings.json",
-                    "Ошибка конфигурации", 
-                    MessageBoxButtons.OK, 
+                    "Ошибка конфигурации",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 buttonAiReview.Enabled = false;  // Отключаем кнопку, если настройки неверны
             }
@@ -100,8 +100,8 @@ namespace StudentWorlsAssignment
             // --- КОНЕЦ: НАСТРОЙКА AI СЕРВИСА ---
 
             this.KeyPreview = true; // чтобы форма получала клавиши первой.[web:271]
-            dataGridViewStudentvsMark.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-            dataGridViewStudentvsMark.Columns[StudentNameColumnIndex].ReadOnly = true; // колонка с именем студента
+            dataGridViewStudentVsMark.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            dataGridViewStudentVsMark.Columns[StudentNameColumnIndex].ReadOnly = true; // колонка с именем студента
 
             SubscribeToEvents();
         }
@@ -109,7 +109,7 @@ namespace StudentWorlsAssignment
         private void SubscribeToEvents()
         {
             //checkBoxSyntax.CheckedChanged += CheckBoxSyntax_CheckedChanged;
-            dataGridViewStudentvsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
+            dataGridViewStudentVsMark.CellContentClick += DataGridViewStudentvsMark_CellContentClick;
             checkedListBoxFiles.SelectedIndexChanged += checkedListBoxFiles_SelectedIndexChanged;
             checkedListBoxFiles.DoubleClick += checkedListBoxFiles_DoubleClick;
         }
@@ -128,21 +128,21 @@ namespace StudentWorlsAssignment
                     MoveToPrevFileOrStudent();
                     return true;
                 case Keys.Left:
-                    if (dataGridViewStudentvsMark.CurrentRow != null)
+                    if (dataGridViewStudentVsMark.CurrentRow != null)
                     {
-                        dataGridViewStudentvsMark.Focus();
-                        dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[StudentNameColumnIndex]; // имя студента
+                        dataGridViewStudentVsMark.Focus();
+                        dataGridViewStudentVsMark.CurrentCell =
+                            dataGridViewStudentVsMark.CurrentRow.Cells[StudentNameColumnIndex]; // имя студента
                     }
                     return true;
 
                 case Keys.Right:
                     // сначала оценка
-                    if (dataGridViewStudentvsMark.Focused &&
-                        dataGridViewStudentvsMark.CurrentRow != null)
+                    if (dataGridViewStudentVsMark.Focused &&
+                        dataGridViewStudentVsMark.CurrentRow != null)
                     {
-                        dataGridViewStudentvsMark.CurrentCell =
-                            dataGridViewStudentvsMark.CurrentRow.Cells[MarkColumnIndex]; // оценка
+                        dataGridViewStudentVsMark.CurrentCell =
+                            dataGridViewStudentVsMark.CurrentRow.Cells[MarkColumnIndex]; // оценка
                     }
                     else
                     {
@@ -165,10 +165,14 @@ namespace StudentWorlsAssignment
                         return true;
                     }
                     break;
-                case Keys.Space:
+                    
+                // Когда вы нажимаете Shift + Space, система передает в метод число,
+                // которое является суммой флагов Keys.Shift и Keys.Space.
+                // Конструкция | в коде как раз формирует это число для сравнения в switch
+                case Keys.Control | Keys.Space:
                     // здесь ставим/снимаем чек у файла, а в грид событие не пускаем
                     ToggleCurrentFileCheck(); // твоя логика чекбокса/флага
-                    return true;              // важное: блокируем стандартную обработку
+                        return true;              // важное: блокируем стандартную обработку
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
@@ -196,13 +200,13 @@ namespace StudentWorlsAssignment
                 return;
 
             // очищаем список студентов и файлов
-            dataGridViewStudentvsMark.Rows.Clear(); // убрать старые строки.[web:195]
+            dataGridViewStudentVsMark.Rows.Clear(); // убрать старые строки.[web:195]
             checkedListBoxFiles.Items.Clear();
             ClearPreview();
 
             string archivePath = openFileDialog.FileName;
 
-            labelArchivFileName.Text = archivePath;
+            labelArchiveFileName.Text = archivePath;
 
             _baseOutputDir = Path.Combine(
                 Path.GetDirectoryName(archivePath)!,
@@ -277,11 +281,11 @@ namespace StudentWorlsAssignment
             if (string.IsNullOrWhiteSpace(assignmentDescription))
             {
                 if (MessageBox.Show(
-                    "Введите условие задачи для оценки.", 
-                    "Будем вводить условие?", 
-                    MessageBoxButtons.YesNo) 
+                    "Введите условие задачи для оценки.",
+                    "Будем вводить условие?",
+                    MessageBoxButtons.YesNo)
                     == DialogResult.Yes)
-                return;
+                    return;
             }
 
             string studentName = _currentStudentName;
@@ -298,7 +302,7 @@ namespace StudentWorlsAssignment
         // Загрузка данных
         private void FillStudentsFromFolders()
         {
-            dataGridViewStudentvsMark.Rows.Clear();
+            dataGridViewStudentVsMark.Rows.Clear();
 
             if (string.IsNullOrEmpty(_baseOutputDir))
                 return;
@@ -308,20 +312,20 @@ namespace StudentWorlsAssignment
             foreach (var folder in studentFolders)
             {
                 string studentName = Path.GetFileName(folder);
-                int rowIndex = dataGridViewStudentvsMark.Rows.Add();
-                dataGridViewStudentvsMark.Rows[rowIndex].Cells[StudentNameColumnIndex].Value = studentName;
+                int rowIndex = dataGridViewStudentVsMark.Rows.Add();
+                dataGridViewStudentVsMark.Rows[rowIndex].Cells[StudentNameColumnIndex].Value = studentName;
             }
-            if (dataGridViewStudentvsMark.Rows.Count > 0)
+            if (dataGridViewStudentVsMark.Rows.Count > 0)
             {
                 // выбираем первого студента
-                dataGridViewStudentvsMark.ClearSelection();
-                var firstRow = dataGridViewStudentvsMark.Rows[0];
+                dataGridViewStudentVsMark.ClearSelection();
+                var firstRow = dataGridViewStudentVsMark.Rows[0];
 
-                dataGridViewStudentvsMark.CurrentCell = firstRow.Cells[StudentNameColumnIndex];
+                dataGridViewStudentVsMark.CurrentCell = firstRow.Cells[StudentNameColumnIndex];
                 firstRow.Cells[StudentNameColumnIndex].Selected = true;
 
                 // ставим фокус в таблицу
-                dataGridViewStudentvsMark.Focus();
+                dataGridViewStudentVsMark.Focus();
 
                 // загружаем файлы и показываем первый
                 LoadFilesForCurrentStudent();
@@ -337,10 +341,10 @@ namespace StudentWorlsAssignment
         }
         private void LoadFilesForCurrentStudent()
         {
-            if (dataGridViewStudentvsMark.CurrentRow == null)
+            if (dataGridViewStudentVsMark.CurrentRow == null)
                 return;
 
-            var cellValue = dataGridViewStudentvsMark.CurrentRow.Cells[StudentNameColumnIndex].Value;
+            var cellValue = dataGridViewStudentVsMark.CurrentRow.Cells[StudentNameColumnIndex].Value;
             if (cellValue == null)
                 return;
 
@@ -418,27 +422,27 @@ namespace StudentWorlsAssignment
                 return;
             }
 
-            if (dataGridViewStudentvsMark.CurrentRow == null)
+            if (dataGridViewStudentVsMark.CurrentRow == null)
             {
                 await BlinkControlAsync(checkedListBoxFiles);
                 return;
             }
 
-            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
-            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+            int currentCol = dataGridViewStudentVsMark.CurrentCell?.ColumnIndex ?? 0;
+            int rowIndex = dataGridViewStudentVsMark.CurrentRow.Index;
 
             if (rowIndex <= 0)
             {
-                await BlinkControlAsync(dataGridViewStudentvsMark);
+                await BlinkControlAsync(dataGridViewStudentVsMark);
                 return;
             }
 
             int prevRowIndex = rowIndex - 1;
 
-            dataGridViewStudentvsMark.ClearSelection();
-            dataGridViewStudentvsMark.CurrentCell =
-                dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol];
-            dataGridViewStudentvsMark.Rows[prevRowIndex].Cells[currentCol].Selected = true;
+            dataGridViewStudentVsMark.ClearSelection();
+            dataGridViewStudentVsMark.CurrentCell =
+                dataGridViewStudentVsMark.Rows[prevRowIndex].Cells[currentCol];
+            dataGridViewStudentVsMark.Rows[prevRowIndex].Cells[currentCol].Selected = true;
 
             LoadFilesForCurrentStudent();
 
@@ -456,27 +460,27 @@ namespace StudentWorlsAssignment
                 return;
             }
 
-            if (dataGridViewStudentvsMark.CurrentRow == null)
+            if (dataGridViewStudentVsMark.CurrentRow == null)
             {
                 await BlinkControlAsync(checkedListBoxFiles);
                 return;
             }
 
-            int currentCol = dataGridViewStudentvsMark.CurrentCell?.ColumnIndex ?? 0;
-            int rowIndex = dataGridViewStudentvsMark.CurrentRow.Index;
+            int currentCol = dataGridViewStudentVsMark.CurrentCell?.ColumnIndex ?? 0;
+            int rowIndex = dataGridViewStudentVsMark.CurrentRow.Index;
 
-            if (rowIndex < 0 || rowIndex >= dataGridViewStudentvsMark.Rows.Count - 2)
+            if (rowIndex < 0 || rowIndex >= dataGridViewStudentVsMark.Rows.Count - 2)
             {
-                await BlinkControlAsync(dataGridViewStudentvsMark);
+                await BlinkControlAsync(dataGridViewStudentVsMark);
                 return;
             }
 
             int nextRowIndex = rowIndex + 1;
 
-            dataGridViewStudentvsMark.ClearSelection();
-            dataGridViewStudentvsMark.CurrentCell =
-                dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol];
-            dataGridViewStudentvsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
+            dataGridViewStudentVsMark.ClearSelection();
+            dataGridViewStudentVsMark.CurrentCell =
+                dataGridViewStudentVsMark.Rows[nextRowIndex].Cells[currentCol];
+            dataGridViewStudentVsMark.Rows[nextRowIndex].Cells[currentCol].Selected = true;
 
             LoadFilesForCurrentStudent();
             if (checkedListBoxFiles.Items.Count > 0)

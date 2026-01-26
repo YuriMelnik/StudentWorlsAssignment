@@ -2,7 +2,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.Text;
 
-namespace StudentWorlsAssignment.Services;
+namespace StudentWorksAssignment.Services;
 
 /// <summary>
 /// Извлекает простой (plain) текст из DOCX-документов.

@@ -1,4 +1,4 @@
-﻿using StudentWorlsAssignment.Ai;
+﻿using StudentWorksAssignment.Ai;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using StudentWorlsAssignment.Ai;
-using StudentWorlsAssignment.Services; // или твой реальный namespace
+using StudentWorksAssignment.Ai;
+using StudentWorksAssignment.Services; // или твой реальный namespace
 
-namespace StudentWorlsAssignment
+namespace StudentWorksAssignment
 {
     public partial class AiReviewForm : Form
     {
