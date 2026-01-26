@@ -34,8 +34,7 @@
             dataGridViewStudentvsMark = new DataGridView();
             Student = new DataGridViewTextBoxColumn();
             Mark = new DataGridViewTextBoxColumn();
-            textBox_NeuroTask = new TextBox();
-            listBoxFiles = new ListBox();
+            textBoxAssignmentDescription = new TextBox();
             label1 = new Label();
             labelArchivFileName = new Label();
             buttonAiReview = new Button();
@@ -44,6 +43,7 @@
             groupBoxHighLighting = new GroupBox();
             rbPython = new RadioButton();
             rbCSharp = new RadioButton();
+            checkedListBoxFiles = new CheckedListBox();
             buttonLosdArchive = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).BeginInit();
             groupBoxHighLighting.SuspendLayout();
@@ -54,7 +54,8 @@
             buttonLosdArchive.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             buttonLosdArchive.BackColor = SystemColors.ButtonHighlight;
             buttonLosdArchive.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            buttonLosdArchive.Location = new Point(833, 117);
+            buttonLosdArchive.Location = new Point(773, 15);
+            buttonLosdArchive.Margin = new Padding(2, 1, 2, 1);
             buttonLosdArchive.Name = "buttonLosdArchive";
             buttonLosdArchive.RightToLeft = RightToLeft.Yes;
             buttonLosdArchive.Size = new Size(101, 56);
@@ -68,24 +69,24 @@
             panelPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panelPreview.BackColor = SystemColors.ControlLightLight;
             panelPreview.BackgroundImageLayout = ImageLayout.Stretch;
-            panelPreview.Location = new Point(12, 12);
+            panelPreview.Location = new Point(7, 15);
             panelPreview.Name = "panelPreview";
-            panelPreview.Size = new Size(545, 402);
+            panelPreview.Size = new Size(491, 457);
             panelPreview.TabIndex = 0;
             // 
             // dataGridViewStudentvsMark
             // 
             dataGridViewStudentvsMark.AllowUserToOrderColumns = true;
-            dataGridViewStudentvsMark.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            dataGridViewStudentvsMark.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             dataGridViewStudentvsMark.BackgroundColor = SystemColors.ControlLightLight;
             dataGridViewStudentvsMark.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewStudentvsMark.Columns.AddRange(new DataGridViewColumn[] { Student, Mark });
-            dataGridViewStudentvsMark.Location = new Point(566, 201);
+            dataGridViewStudentvsMark.Location = new Point(506, 100);
             dataGridViewStudentvsMark.MultiSelect = false;
             dataGridViewStudentvsMark.Name = "dataGridViewStudentvsMark";
             dataGridViewStudentvsMark.RowHeadersWidth = 40;
             dataGridViewStudentvsMark.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dataGridViewStudentvsMark.Size = new Size(368, 284);
+            dataGridViewStudentvsMark.Size = new Size(368, 244);
             dataGridViewStudentvsMark.TabIndex = 2;
             dataGridViewStudentvsMark.CellClick += DataGridViewStudentvsMark_CellContentClick;
             // 
@@ -104,32 +105,27 @@
             Mark.Name = "Mark";
             Mark.Width = 200;
             // 
-            // textBox_NeuroTask
+            // textBoxAssignmentDescription
             // 
-            textBox_NeuroTask.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox_NeuroTask.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            textBox_NeuroTask.ForeColor = SystemColors.ActiveCaption;
-            textBox_NeuroTask.Location = new Point(566, 12);
-            textBox_NeuroTask.Name = "textBox_NeuroTask";
-            textBox_NeuroTask.Size = new Size(343, 29);
-            textBox_NeuroTask.TabIndex = 4;
-            textBox_NeuroTask.Text = "Задание для нейропомощника";
-            // 
-            // listBoxFiles
-            // 
-            listBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            listBoxFiles.FormattingEnabled = true;
-            listBoxFiles.Location = new Point(12, 421);
-            listBoxFiles.Name = "listBoxFiles";
-            listBoxFiles.Size = new Size(545, 64);
-            listBoxFiles.TabIndex = 5;
+            textBoxAssignmentDescription.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            textBoxAssignmentDescription.BackColor = SystemColors.GradientInactiveCaption;
+            textBoxAssignmentDescription.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            textBoxAssignmentDescription.ForeColor = SystemColors.ActiveCaption;
+            textBoxAssignmentDescription.Location = new Point(504, 350);
+            textBoxAssignmentDescription.MinimumSize = new Size(0, 80);
+            textBoxAssignmentDescription.Multiline = true;
+            textBoxAssignmentDescription.Name = "textBoxAssignmentDescription";
+            textBoxAssignmentDescription.ScrollBars = ScrollBars.Vertical;
+            textBoxAssignmentDescription.Size = new Size(370, 172);
+            textBoxAssignmentDescription.TabIndex = 4;
+            textBoxAssignmentDescription.Text = "Условие задачи\r\nЗадание для студентов";
             // 
             // label1
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label1.AutoSize = true;
             label1.ForeColor = SystemColors.ButtonShadow;
-            label1.Location = new Point(805, 0);
+            label1.Location = new Point(743, -1);
             label1.Name = "label1";
             label1.Size = new Size(131, 15);
             label1.TabIndex = 7;
@@ -140,7 +136,7 @@
             labelArchivFileName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelArchivFileName.AutoSize = true;
             labelArchivFileName.ForeColor = SystemColors.ControlDarkDark;
-            labelArchivFileName.Location = new Point(566, 117);
+            labelArchivFileName.Location = new Point(503, 15);
             labelArchivFileName.MaximumSize = new Size(260, 60);
             labelArchivFileName.Name = "labelArchivFileName";
             labelArchivFileName.Size = new Size(260, 60);
@@ -149,13 +145,13 @@
             // 
             // buttonAiReview
             // 
-            buttonAiReview.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonAiReview.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             buttonAiReview.BackColor = SystemColors.GradientInactiveCaption;
             buttonAiReview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             buttonAiReview.ForeColor = SystemColors.HotTrack;
-            buttonAiReview.Location = new Point(833, 76);
+            buttonAiReview.Location = new Point(773, 528);
             buttonAiReview.Name = "buttonAiReview";
-            buttonAiReview.Size = new Size(99, 35);
+            buttonAiReview.Size = new Size(101, 26);
             buttonAiReview.TabIndex = 10;
             buttonAiReview.Text = "AI-проверка";
             buttonAiReview.UseVisualStyleBackColor = false;
@@ -163,20 +159,21 @@
             // 
             // buttonProperties
             // 
+            buttonProperties.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             buttonProperties.BackColor = SystemColors.ButtonFace;
             buttonProperties.BackgroundImage = Properties.Resources.settings100;
             buttonProperties.BackgroundImageLayout = ImageLayout.Stretch;
             buttonProperties.Image = Properties.Resources.settings;
-            buttonProperties.Location = new Point(911, 15);
+            buttonProperties.Location = new Point(740, 528);
             buttonProperties.Name = "buttonProperties";
-            buttonProperties.Size = new Size(25, 22);
+            buttonProperties.Size = new Size(27, 26);
             buttonProperties.TabIndex = 11;
             buttonProperties.UseVisualStyleBackColor = false;
             // 
             // rbNoHighlight
             // 
             rbNoHighlight.AutoSize = true;
-            rbNoHighlight.Location = new Point(147, -2);
+            rbNoHighlight.Location = new Point(147, -3);
             rbNoHighlight.Name = "rbNoHighlight";
             rbNoHighlight.Size = new Size(109, 19);
             rbNoHighlight.TabIndex = 12;
@@ -186,13 +183,14 @@
             // 
             // groupBoxHighLighting
             // 
+            groupBoxHighLighting.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             groupBoxHighLighting.BackColor = SystemColors.ActiveCaption;
             groupBoxHighLighting.Controls.Add(rbPython);
             groupBoxHighLighting.Controls.Add(rbCSharp);
             groupBoxHighLighting.Controls.Add(rbNoHighlight);
             groupBoxHighLighting.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             groupBoxHighLighting.ForeColor = SystemColors.ControlLightLight;
-            groupBoxHighLighting.Location = new Point(566, 176);
+            groupBoxHighLighting.Location = new Point(504, 75);
             groupBoxHighLighting.Name = "groupBoxHighLighting";
             groupBoxHighLighting.Size = new Size(370, 19);
             groupBoxHighLighting.TabIndex = 13;
@@ -202,7 +200,7 @@
             // rbPython
             // 
             rbPython.AutoSize = true;
-            rbPython.Location = new Point(298, -2);
+            rbPython.Location = new Point(298, -3);
             rbPython.Name = "rbPython";
             rbPython.Size = new Size(64, 19);
             rbPython.TabIndex = 14;
@@ -214,7 +212,7 @@
             // 
             rbCSharp.AutoSize = true;
             rbCSharp.Checked = true;
-            rbCSharp.Location = new Point(258, -2);
+            rbCSharp.Location = new Point(258, -3);
             rbCSharp.Name = "rbCSharp";
             rbCSharp.Size = new Size(39, 19);
             rbCSharp.TabIndex = 13;
@@ -223,22 +221,34 @@
             rbCSharp.UseVisualStyleBackColor = true;
             rbCSharp.CheckedChanged += rbHighlightMode_CheckedChanged;
             // 
+            // checkedListBoxFiles
+            // 
+            checkedListBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            checkedListBoxFiles.FormattingEnabled = true;
+            checkedListBoxFiles.HorizontalScrollbar = true;
+            checkedListBoxFiles.Location = new Point(7, 478);
+            checkedListBoxFiles.Name = "checkedListBoxFiles";
+            checkedListBoxFiles.Size = new Size(491, 76);
+            checkedListBoxFiles.TabIndex = 14;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(946, 497);
+            ClientSize = new Size(884, 561);
+            Controls.Add(checkedListBoxFiles);
             Controls.Add(groupBoxHighLighting);
             Controls.Add(buttonProperties);
-            Controls.Add(listBoxFiles);
             Controls.Add(buttonAiReview);
             Controls.Add(labelArchivFileName);
             Controls.Add(label1);
-            Controls.Add(textBox_NeuroTask);
+            Controls.Add(textBoxAssignmentDescription);
             Controls.Add(dataGridViewStudentvsMark);
             Controls.Add(buttonLosdArchive);
             Controls.Add(panelPreview);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            KeyPreview = true;
+            MinimumSize = new Size(900, 600);
             Name = "Form1";
             Text = "Помощник  проверки заданий";
             ((System.ComponentModel.ISupportInitialize)dataGridViewStudentvsMark).EndInit();
@@ -253,10 +263,9 @@
         private Panel panelPreview;
         private Button buttonLosdArchive;
         private DataGridView dataGridViewStudentvsMark;
-        private TextBox textBox_NeuroTask;
+        private TextBox textBoxAssignmentDescription;
         private DataGridViewTextBoxColumn Student;
         private DataGridViewTextBoxColumn Mark;
-        private ListBox listBoxFiles;
         private Label label1;
         private Label labelArchivFileName;
         private Button buttonAiReview;
@@ -265,5 +274,6 @@
         private GroupBox groupBoxHighLighting;
         private RadioButton rbPython;
         private RadioButton rbCSharp;
+        private CheckedListBox checkedListBoxFiles;
     }
 }
